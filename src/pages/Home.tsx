@@ -1,33 +1,99 @@
-import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { fetchProducts } from '../features/products/productsSlice';
-import ProductCard from '../components/ProductCard';
-import { addToCart } from '../features/cart/cartSlice';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../features/cart/cartSlice";
 
-export default function Home() {
-  const dispatch = useAppDispatch();
-  const products = useAppSelector(s => s.products.items);
-  const status = useAppSelector(s => s.products.status);
-  const auth = useAppSelector(s => s.auth);
-  const nav = useNavigate();
+export default function HomePage() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [sort, setSort] = useState("");
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (status === 'idle') dispatch(fetchProducts());
-  }, [dispatch, status]);
+    const fetchProducts = async () => {
+      const query = new URLSearchParams();
 
-  const handleAdd = (productId: number) => {
-    if (!auth.token || !auth.userId) { nav('/login'); return; }
-    dispatch(addToCart({ userId: auth.userId!, productId, quantity: 1 }));
-  };
+      if (search) query.append("search", search);
+      if (category) query.append("category", category);
+      if (minPrice) query.append("minPrice", minPrice);
+      if (maxPrice) query.append("maxPrice", maxPrice);
+      if (sort) query.append("sort", sort);
+
+      const res = await fetch(`http://localhost:3001/products?${query.toString()}`);
+      const data = await res.json();
+      setProducts(data);
+    };
+
+    fetchProducts();
+  }, [search, category, minPrice, maxPrice, sort]);
 
   return (
-    <div>
-      <h1 className="mb-4 font-bold text-2xl">Products</h1>
-      <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
-        {products.map(p => (
-          <ProductCard key={p.id} product={p} onAdd={() => handleAdd(p.id)} />
-        ))}
+    <div style={{ padding: "20px" }}>
+      <h1>Все продукты</h1>
+
+      {/* Фильтры */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Поиск по названию"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="">Все категории</option>
+          <option value="Одежда">Одежда</option>
+          <option value="Обувь">Обувь</option>
+          <option value="Штаны">Штаны</option>
+          <option value="equipment">Оборудование</option>
+          <option value="nutrition">Питание</option>
+        </select>
+
+        <input
+          type="number"
+          placeholder="Мин. цена"
+          value={minPrice}
+          onChange={(e) => setMinPrice(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Макс. цена"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(e.target.value)}
+        />
+
+        <select value={sort} onChange={(e) => setSort(e.target.value)}>
+          <option value="">Без сортировки</option>
+          <option value="price_asc">Цена: по возрастанию</option>
+          <option value="price_desc">Цена: по убыванию</option>
+          <option value="name_asc">Название: A-Z</option>
+          <option value="name_desc">Название: Z-A</option>
+        </select>
+      </div>
+
+      {/* Список продуктов */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+        {products.length > 0 ? (
+          products.map((p) => (
+            <div key={p.id} style={{ border: "1px solid #ccc", padding: "10px" }}>
+              <Link to={`/products/${p.id}`}>
+                <img src={p.image} alt={p.name} style={{ width: "100%", height: "150px", objectFit: "cover" }} />
+                <h3>{p.name}</h3>
+              </Link>
+              <p>{p.price} $</p>
+              <p>{p.category}</p>
+              <button onClick={() => dispatch(addToCart(p))}>
+                Добавить в корзину
+              </button>
+            </div>
+          ))
+        ) : (
+          <p>Нет продуктов</p>
+        )}
       </div>
     </div>
   );

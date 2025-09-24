@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import api from '../api/axios';
 import { useAppDispatch } from '../app/hooks';
 import { setCredentials } from '../features/auth/authSlice';
+import { parseJwt } from '../utils/jwt';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
@@ -12,19 +13,25 @@ export default function Login() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await api.post('/auth/login', { email, password });
-    const token = res.data.access_token;
-    // token payload contains userId and role — if you want to decode put userId in local storage (backend can return too)
-    dispatch(setCredentials({ token }));
-    nav('/');
+    try {
+      const res = await api.post('/auth/login', { email, password });
+      const token = res.data.access_token;
+      const payload = parseJwt(token);
+      const userId = payload?.userId ?? payload?.userID ?? payload?.user_id;
+      const role = payload?.role;
+      dispatch(setCredentials({ token, userId, role }));
+      nav('/');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Ошибка логина');
+    }
   };
 
   return (
-    <form onSubmit={submit} className="bg-white mx-auto p-4 rounded max-w-md">
-      <h2 className="mb-4 font-bold text-xl">Login</h2>
-      <input className="mb-2 p-2 border rounded w-full" value={email} onChange={e => setEmail(e.target.value)} />
-      <input className="mb-2 p-2 border rounded w-full" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      <button className="bg-blue-600 px-4 py-2 rounded text-white">Login</button>
+    <form onSubmit={submit} className="bg-white shadow mx-auto mt-10 p-6 rounded max-w-md">
+      <h2 className="mb-4 font-bold text-2xl">Login</h2>
+      <input value={email} onChange={e => setEmail(e.target.value)} className="mb-2 p-2 border rounded w-full" />
+      <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="mb-4 p-2 border rounded w-full" />
+      <button className="bg-blue-600 py-2 rounded w-full text-white">Login</button>
     </form>
   );
 }

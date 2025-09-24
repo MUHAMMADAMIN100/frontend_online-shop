@@ -7,11 +7,13 @@ interface AuthState {
 }
 
 const tokenFromStorage = localStorage.getItem('token');
+const userIdFromStorage = localStorage.getItem('userId');
+const roleFromStorage = localStorage.getItem('role');
 
 const initialState: AuthState = {
-  token: tokenFromStorage,
-  userId: tokenFromStorage ? Number(localStorage.getItem('userId')) : null,
-  role: localStorage.getItem('role') ?? null,
+  token: tokenFromStorage ?? null,
+  userId: userIdFromStorage ? Number(userIdFromStorage) : null,
+  role: roleFromStorage ?? null,
 };
 
 const authSlice = createSlice({
@@ -20,10 +22,10 @@ const authSlice = createSlice({
   reducers: {
     setCredentials(state, action: PayloadAction<{ token: string; userId?: number; role?: string }>) {
       state.token = action.payload.token;
-      state.userId = action.payload.userId ?? null;
-      state.role = action.payload.role ?? null;
+      state.userId = action.payload.userId ?? state.userId ?? null;
+      state.role = action.payload.role ?? state.role ?? null;
       localStorage.setItem('token', action.payload.token);
-      if (action.payload.userId) localStorage.setItem('userId', String(action.payload.userId));
+      if (action.payload.userId !== undefined) localStorage.setItem('userId', String(action.payload.userId));
       if (action.payload.role) localStorage.setItem('role', action.payload.role);
     },
     logout(state) {
