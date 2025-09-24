@@ -1,40 +1,59 @@
-import React, { useState } from 'react';
-import api from '../api/axios';
-import { useAppDispatch } from '../app/hooks';
-import { setCredentials } from '../features/auth/authSlice';
-import { parseJwt } from '../utils/jwt';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Register() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const dispatch = useAppDispatch();
-  const nav = useNavigate();
+export default function RegisterPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const submit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await api.post('/auth/register', { email, password });
-      // если бэкенд возвращает token
-      const token = res.data.access_token ?? res.data.token;
-      if (token) {
-        const payload = parseJwt(token);
-        const userId = payload?.userId ?? payload?.userID ?? payload?.user_id;
-        const role = payload?.role;
-        dispatch(setCredentials({ token, userId, role }));
+      const res = await fetch("http://localhost:3001/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Ошибка при регистрации");
       }
-      nav('/');
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Ошибка регистрации');
+
+      const data = await res.json();
+
+      // Сохраняем токен в localStorage
+      localStorage.setItem("token", data.accessToken); // или data.token
+
+      // Перенаправляем на главную
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      alert("Ошибка при регистрации");
     }
   };
 
   return (
-    <form onSubmit={submit} className="bg-white shadow mx-auto mt-10 p-6 rounded max-w-md">
-      <h2 className="mb-4 font-bold text-2xl">Register</h2>
-      <input value={email} onChange={e => setEmail(e.target.value)} className="mb-2 p-2 border rounded w-full" />
-      <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="mb-4 p-2 border rounded w-full" />
-      <button className="bg-green-600 py-2 rounded w-full text-white">Register</button>
+    <form onSubmit={handleRegister} className="flex flex-col gap-3 mx-auto mt-20 w-80">
+      <h2 className="font-bold text-2xl text-center">Регистрация</h2>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="p-2 border rounded"
+      />
+      <input
+        type="password"
+        placeholder="Пароль"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="p-2 border rounded"
+      />
+      <button type="submit" className="bg-green-500 p-2 rounded text-white">
+        Зарегистрироваться
+      </button>
     </form>
   );
 }

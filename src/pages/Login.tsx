@@ -1,37 +1,59 @@
-import React, { useState } from 'react';
-import api from '../api/axios';
-import { useAppDispatch } from '../app/hooks';
-import { setCredentials } from '../features/auth/authSlice';
-import { parseJwt } from '../utils/jwt';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
-  const [email, setEmail] = useState('user@example.com');
-  const [password, setPassword] = useState('123456');
-  const dispatch = useAppDispatch();
-  const nav = useNavigate();
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const submit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await api.post('/auth/login', { email, password });
-      const token = res.data.access_token;
-      const payload = parseJwt(token);
-      const userId = payload?.userId ?? payload?.userID ?? payload?.user_id;
-      const role = payload?.role;
-      dispatch(setCredentials({ token, userId, role }));
-      nav('/');
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Ошибка логина');
+      const res = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Неправильный логин или пароль");
+      }
+
+      const data = await res.json();
+
+      // Сохраняем токен в localStorage
+      localStorage.setItem("token", data.accessToken); // или data.token, если сервер так возвращает
+
+      // Перенаправляем пользователя на главную
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      alert("Ошибка при логине");
     }
   };
 
   return (
-    <form onSubmit={submit} className="bg-white shadow mx-auto mt-10 p-6 rounded max-w-md">
-      <h2 className="mb-4 font-bold text-2xl">Login</h2>
-      <input value={email} onChange={e => setEmail(e.target.value)} className="mb-2 p-2 border rounded w-full" />
-      <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="mb-4 p-2 border rounded w-full" />
-      <button className="bg-blue-600 py-2 rounded w-full text-white">Login</button>
+    <form onSubmit={handleLogin} className="flex flex-col gap-3 mx-auto mt-20 w-80">
+      <h2 className="font-bold text-2xl text-center">Вход</h2>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="p-2 border rounded"
+      />
+      <input
+        type="password"
+        placeholder="Пароль"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="p-2 border rounded"
+      />
+      <button type="submit" className="bg-blue-500 p-2 rounded text-white">
+        Войти
+      </button>
     </form>
   );
 }
