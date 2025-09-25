@@ -1,38 +1,49 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import { useDispatch } from "react-redux";
 import { addToCart } from "../features/cart/cartSlice";
+import type { AppDispatch } from '../app/store';
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+}
+
 
 export default function ProductPage() {
   const { id } = useParams();
-  const [product, setProduct] = useState<any>(null);
-  const dispatch = useDispatch();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      const res = await fetch(`http://localhost:3001/products/${id}`);
-      const data = await res.json();
-      setProduct(data);
-    };
-
-    fetchProduct();
+    if (id) {
+      axios
+        .get(`http://localhost:3001/products/${id}`)
+        .then((res) => {
+          setProduct(res.data);
+        })
+        .catch((err) => console.error(err))
+        .finally(() => setLoading(false));
+    }
   }, [id]);
 
-  if (!product) {
-    return <p>Загрузка...</p>;
-  }
+  if (loading) return <p>Загрузка...</p>;
+  if (!product) return <p>Продукт не найден</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>{product.name}</h1>
-      <img src={product.image} alt={product.name} style={{ width: "300px" }} />
-      <p>Цена: {product.price} $</p>
-      <p>Категория: {product.category}</p>
+    <div className="p-6">
+      <h1 className="font-bold text-2xl">{product.name}</h1>
       <p>{product.description}</p>
-
-      <button onClick={() => dispatch(addToCart(product))}>
-        Добавить в корзину
-      </button>
+      <p className="font-semibold text-lg">{product.price} $</p>
+      {product.image && (
+        <img src={product.image} alt={product.name} className="mt-4 w-64" />
+      )}
     </div>
   );
 }
+

@@ -1,99 +1,97 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../features/cart/cartSlice";
+import type { AppDispatch } from "../app/store";
 
-export default function HomePage() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [sort, setSort] = useState("");
+// Тип Product объявляем прямо здесь
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  createdAt: string;
+}
 
-  const dispatch = useDispatch();
+export default function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [minPrice, setMinPrice] = useState<number | undefined>();
+  const [maxPrice, setMaxPrice] = useState<number | undefined>();
+  const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const query = new URLSearchParams();
+      try {
+        const response = await axios.get("http://localhost:3001/products");
+        let filtered: Product[] = response.data;
 
-      if (search) query.append("search", search);
-      if (category) query.append("category", category);
-      if (minPrice) query.append("minPrice", minPrice);
-      if (maxPrice) query.append("maxPrice", maxPrice);
-      if (sort) query.append("sort", sort);
+        if (minPrice !== undefined) {
+          filtered = filtered.filter(p => p.price >= minPrice);
+        }
+        if (maxPrice !== undefined) {
+          filtered = filtered.filter(p => p.price <= maxPrice);
+        }
+        if (search.trim() !== "") {
+          filtered = filtered.filter(p =>
+            p.name.toLowerCase().includes(search.toLowerCase())
+          );
+        }
 
-      const res = await fetch(`http://localhost:3001/products?${query.toString()}`);
-      const data = await res.json();
-      setProducts(data);
+        setProducts(filtered);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     fetchProducts();
-  }, [search, category, minPrice, maxPrice, sort]);
+  }, [minPrice, maxPrice, search]);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const handleAdd = (id: number) => {
+    dispatch(addToCart({ productId: id, quantity: 1 }));
+  };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Все продукты</h1>
+    <div>
+      <h1 className="mb-4 font-bold text-2xl">Products</h1>
 
-      {/* Фильтры */}
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+      <div className="mb-4">
+        <input
+          type="number"
+          placeholder="Min price"
+          value={minPrice ?? ""}
+          onChange={e => setMinPrice(e.target.value ? +e.target.value : undefined)}
+          className="mr-2 p-1 border"
+        />
+        <input
+          type="number"
+          placeholder="Max price"
+          value={maxPrice ?? ""}
+          onChange={e => setMaxPrice(e.target.value ? +e.target.value : undefined)}
+          className="mr-2 p-1 border"
+        />
         <input
           type="text"
-          placeholder="Поиск по названию"
+          placeholder="Search"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={e => setSearch(e.target.value)}
+          className="p-1 border"
         />
-
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">Все категории</option>
-          <option value="Одежда">Одежда</option>
-          <option value="Обувь">Обувь</option>
-          <option value="Штаны">Штаны</option>
-          <option value="equipment">Оборудование</option>
-          <option value="nutrition">Питание</option>
-        </select>
-
-        <input
-          type="number"
-          placeholder="Мин. цена"
-          value={minPrice}
-          onChange={(e) => setMinPrice(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Макс. цена"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(e.target.value)}
-        />
-
-        <select value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="">Без сортировки</option>
-          <option value="price_asc">Цена: по возрастанию</option>
-          <option value="price_desc">Цена: по убыванию</option>
-          <option value="name_asc">Название: A-Z</option>
-          <option value="name_desc">Название: Z-A</option>
-        </select>
       </div>
 
-      {/* Список продуктов */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
-        {products.length > 0 ? (
-          products.map((p) => (
-            <div key={p.id} style={{ border: "1px solid #ccc", padding: "10px" }}>
-              <Link to={`/products/${p.id}`}>
-                <img src={p.image} alt={p.name} style={{ width: "100%", height: "150px", objectFit: "cover" }} />
-                <h3>{p.name}</h3>
-              </Link>
-              <p>{p.price} $</p>
-              <p>{p.category}</p>
-              <button onClick={() => dispatch(addToCart(p))}>
-                Добавить в корзину
-              </button>
-            </div>
-          ))
-        ) : (
-          <p>Нет продуктов</p>
-        )}
+      <div className="gap-4 grid grid-cols-3">
+        {products.map(product => (
+          <Link key={product.id} to={`/product/${product.id}`} className="p-2 border">
+            <img src={product.image} alt={product.name} className="mb-2 w-full h-40 object-cover"/>
+            <h2 className="font-bold">{product.name}</h2>
+            <p>${product.price}</p>
+             <button onClick={() => handleAdd(1)}>Добавить товар 1</button>
+          </Link>
+          
+        ))}
       </div>
     </div>
   );

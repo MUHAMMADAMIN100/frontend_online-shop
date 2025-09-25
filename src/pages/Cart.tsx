@@ -1,48 +1,60 @@
-import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { fetchCart, removeCartItem, updateCartItem } from '../features/cart/cartSlice';
-import { useNavigate } from 'react-router-dom';
-import { createOrder } from '../features/orders/ordersSlice';
+
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type {AppDispatch } from "../app/store";
+import type { RootState } from "../app/store";
+import { fetchCart, removeItem, updateItem, clearCart } from "../features/cart/cartSlice";
 
 export default function Cart() {
-  const dispatch = useAppDispatch();
-  const auth = useAppSelector(s => s.auth);
-  const items = useAppSelector(s => s.cart.items);
-  const nav = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { items } = useSelector((state: RootState) => state.cart);
+
+  
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    if (auth.userId) dispatch(fetchCart(auth.userId));
-  }, [dispatch, auth.userId]);
+    if (userId) {
+      dispatch(fetchCart(Number(userId)));
+    }
+  }, [dispatch, userId]);
 
-  const handleCheckout = async () => {
-    if (!auth.token) return nav('/login');
-    await dispatch(createOrder());
-    nav('/orders'); // you may create /orders page later
+  const handleRemove = (id: number) => {
+    dispatch(removeItem(id));
+  };
+
+  const handleUpdate = (id: number, quantity: number) => {
+    if (quantity > 0) {
+      dispatch(updateItem({ cartItemId: id, quantity }));
+    }
+  };
+
+  const handleClear = () => {
+    if (userId) {
+      dispatch(clearCart(Number(userId)));
+    }
   };
 
   return (
-    <div>
-      <h1 className="mb-4 font-bold text-2xl">Cart</h1>
-      {items.length === 0 ? <div>Your cart is empty</div> : (
-        <div className="space-y-3">
-          {items.map(it => (
-            <div key={it.id} className="flex justify-between items-center bg-white p-3 border rounded">
-              <div>
-                <div className="font-medium">{it.product?.name}</div>
-                <div className="text-gray-600 text-sm">{it.quantity} × {it.product?.price}$</div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button onClick={() => dispatch(updateCartItem({ cartItemId: it.id, quantity: Math.max(1, it.quantity - 1) }))}>-</button>
-                <div>{it.quantity}</div>
-                <button onClick={() => dispatch(updateCartItem({ cartItemId: it.id, quantity: it.quantity + 1 }))}>+</button>
-                <button onClick={() => dispatch(removeCartItem(it.id))} className="text-red-600">Remove</button>
-              </div>
-            </div>
-          ))}
-          <div>
-            <button onClick={handleCheckout} className="bg-green-600 px-4 py-2 rounded text-white">Checkout</button>
-          </div>
-        </div>
+    <div style={{ padding: "20px" }}>
+      <h2>🛒 Ваша корзина</h2>
+      {items.length === 0 ? (
+        <p>Корзина пуста</p>
+      ) : (
+        <>
+          <ul>
+            {items.map((item: any) => (
+              <li key={item.id} style={{ marginBottom: "10px" }}>
+                <strong>{item.product.name}</strong> — {item.quantity} шт.
+                <div>
+                  <button onClick={() => handleUpdate(item.id, item.quantity - 1)}>-</button>
+                  <button onClick={() => handleUpdate(item.id, item.quantity + 1)}>+</button>
+                  <button onClick={() => handleRemove(item.id)}>Удалить</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <button onClick={handleClear}>Очистить корзину</button>
+        </>
       )}
     </div>
   );

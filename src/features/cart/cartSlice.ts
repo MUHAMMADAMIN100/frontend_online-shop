@@ -1,75 +1,87 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import api from '../../api/axios';
+// src/features/cart/cartSlice.ts
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-export interface CartItem {
-  id: number;
-  cartId?: number;
-  productId: number;
-  quantity: number;
-  product?: any;
-}
+const API_URL = "http://localhost:3001/cart";
 
-interface CartState {
-  items: CartItem[];
-  status: 'idle'|'loading'|'succeeded'|'failed';
-  error?: string | null;
-}
+// Берём токен из localStorage
+const getAuthHeader = () => {
+  const token = localStorage.getItem("token");
+  return { headers: { Authorization: `Bearer ${token}` } };
+};
 
-const initialState: CartState = { items: [], status: 'idle', error: null };
-
-// fetchCart needs userId (from auth state)
-export const fetchCart = createAsyncThunk<CartItem[], number>('cart/fetch', async (userId) => {
-  const res = await api.get(`/cart/${userId}`);
-  return res.data.items ?? [];
-});
-
-export const addToCart = createAsyncThunk<CartItem, { productId: number; quantity: number }>(
-  'cart/add',
-  async ({ productId, quantity }) => {
-    const res = await api.post(`/cart/add`, { productId, quantity });
-    return res.data as CartItem;
+// Получить корзину по userId
+export const fetchCart = createAsyncThunk(
+  "cart/fetchCart",
+  async (userId: number) => {
+    const res = await axios.get(`${API_URL}/${userId}`, getAuthHeader());
+    return res.data;
   }
 );
 
-export const updateCartItem = createAsyncThunk<CartItem, { cartItemId: number; quantity: number }>(
-  'cart/update',
-  async ({ cartItemId, quantity }) => {
-    const res = await api.put(`/cart/update/${cartItemId}`, { quantity });
-    return res.data as CartItem;
+// Добавить товар
+export const addToCart = createAsyncThunk(
+  "cart/addToCart",
+  async ({ productId, quantity }: { productId: number; quantity: number }) => {
+    const res = await axios.post(`${API_URL}/add`, { productId, quantity }, getAuthHeader());
+    return res.data;
   }
 );
 
-export const removeCartItem = createAsyncThunk<number, number>(
-  'cart/remove',
-  async (cartItemId) => {
-    const res = await api.delete(`/cart/remove/${cartItemId}`);
-    // backend returns deleted item — for safety return id
+// Обновить товар
+export const updateItem = createAsyncThunk(
+  "cart/updateItem",
+  async ({ cartItemId, quantity }: { cartItemId: number; quantity: number }) => {
+    const res = await axios.put(`${API_URL}/update/${cartItemId}`, { quantity }, getAuthHeader());
+    return res.data;
+  }
+);
+
+// Удалить товар
+export const removeItem = createAsyncThunk(
+  "cart/removeItem",
+  async (cartItemId: number) => {
+    await axios.delete(`${API_URL}/remove/${cartItemId}`, getAuthHeader());
     return cartItemId;
   }
 );
 
+// Очистить корзину
+export const clearCart = createAsyncThunk(
+  "cart/clearCart",
+  async (userId: number) => {
+    await axios.delete(`${API_URL}/clear/${userId}`, getAuthHeader());
+    return [];
+  }
+);
+
 const cartSlice = createSlice({
-  name: 'cart',
-  initialState,
-  reducers: { clearLocalCart(state) { state.items = []; } },
-  extraReducers(builder) {
+  name: "cart",
+  initialState: {
+    items: [] as any[],
+    status: "idle",
+    error: null as string | null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
     builder
-      .addCase(fetchCart.fulfilled, (state, action) => { state.items = action.payload; state.status = 'succeeded'; })
+      .addCase(fetchCart.fulfilled, (state, action) => {
+        state.items = action.payload;
+      })
       .addCase(addToCart.fulfilled, (state, action) => {
-        // если пришёл элемент, обновим/добавим
-        const idx = state.items.findIndex(i => i.id === action.payload.id);
-        if (idx >= 0) state.items[idx] = action.payload;
-        else state.items.push(action.payload);
+        state.items.push(action.payload);
       })
-      .addCase(updateCartItem.fulfilled, (state, action) => {
-        const idx = state.items.findIndex(i => i.id === action.payload.id);
-        if (idx >= 0) state.items[idx] = action.payload;
+      .addCase(updateItem.fulfilled, (state, action) => {
+        const idx = state.items.findIndex((i) => i.id === action.payload.id);
+        if (idx !== -1) state.items[idx] = action.payload;
       })
-      .addCase(removeCartItem.fulfilled, (state, action) => {
-        state.items = state.items.filter(i => i.id !== action.payload);
+      .addCase(removeItem.fulfilled, (state, action) => {
+        state.items = state.items.filter((i) => i.id !== action.payload);
+      })
+      .addCase(clearCart.fulfilled, (state) => {
+        state.items = [];
       });
   },
 });
 
-export const { clearLocalCart } = cartSlice.actions;
 export default cartSlice.reducer;

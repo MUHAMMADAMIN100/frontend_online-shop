@@ -1,59 +1,62 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:3001/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const res = await fetch('http://localhost:3001/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
-      if (!res.ok) {
-        throw new Error("Неправильный логин или пароль");
-      }
-
       const data = await res.json();
 
-      // Сохраняем токен в localStorage
-      localStorage.setItem("token", data.accessToken); // или data.token, если сервер так возвращает
+      if (res.ok) {
+        // Сохраняем токен корректно
+        localStorage.setItem('token', data.access_token);
 
-      // Перенаправляем пользователя на главную
-      navigate("/");
+        // Редирект на главную страницу
+        navigate('/');
+      } else {
+        alert(data.message || 'Ошибка при логине');
+      }
     } catch (error) {
       console.error(error);
-      alert("Ошибка при логине");
+      alert('Ошибка при подключении к серверу');
     }
   };
 
   return (
-    <form onSubmit={handleLogin} className="flex flex-col gap-3 mx-auto mt-20 w-80">
-      <h2 className="font-bold text-2xl text-center">Вход</h2>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="p-2 border rounded"
-      />
-      <input
-        type="password"
-        placeholder="Пароль"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="p-2 border rounded"
-      />
-      <button type="submit" className="bg-blue-500 p-2 rounded text-white">
-        Войти
-      </button>
-    </form>
+    <div className="flex justify-center items-center h-screen">
+      <form className="bg-white shadow-md p-6 rounded w-96" onSubmit={handleSubmit}>
+        <h2 className="mb-4 font-bold text-2xl">Login</h2>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="mb-3 p-2 border rounded w-full"
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          className="mb-3 p-2 border rounded w-full"
+          required
+        />
+        <button type="submit" className="bg-blue-500 hover:bg-blue-600 p-2 rounded w-full text-white">
+          Login
+        </button>
+      </form>
+    </div>
   );
-}
+};
+
+export default LoginPage;

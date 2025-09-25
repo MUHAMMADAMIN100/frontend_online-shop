@@ -1,43 +1,33 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '../app/hooks';
-import { logout } from '../features/auth/authSlice';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-
-  // Безопасная проверка токена
-  const token = useAppSelector((state) => state.auth?.token ?? null);
+  const token = localStorage.getItem('token');
 
   const handleLogout = () => {
-    dispatch(logout());
+    localStorage.removeItem('token');
     navigate('/login');
   };
 
   return (
-    <nav className="flex justify-between bg-blue-600 p-4 text-white">
-      <div>
-        <Link to="/" className="font-bold text-xl">
-          Shop
-        </Link>
+    <nav className="flex justify-between bg-blue-500 p-4 text-white">
+      <div className="font-bold text-xl">
+        <Link to="/">Online Shop</Link>
       </div>
-      <div>
+      <div className="space-x-4">
         {token ? (
           <>
-            <Link to="/cart" className="mr-4">
-              Cart
-            </Link>
-            <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded">
+            <button onClick={handleLogout} className="hover:underline">
               Logout
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" className="mr-4">
+            <Link to="/login" className="hover:underline">
               Login
             </Link>
-            <Link to="/register" className="bg-green-500 px-3 py-1 rounded">
+            <Link to="/register" className="hover:underline">
               Register
             </Link>
           </>
