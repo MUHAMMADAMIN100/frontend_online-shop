@@ -1,61 +1,81 @@
-
-import { useEffect } from "react";
+// Cart.tsx
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type {AppDispatch } from "../app/store";
+import {
+  fetchCart,
+  addToCart,
+  removeFromCart,
+  clearCart,
+} from "../features/cart/cartSlice";
 import type { RootState } from "../app/store";
-import { fetchCart, removeItem, updateItem, clearCart } from "../features/cart/cartSlice";
 
-export default function Cart() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { items } = useSelector((state: RootState) => state.cart);
-
-  
-  const userId = localStorage.getItem("userId");
+const Cart: React.FC = () => {
+  const dispatch = useDispatch<any>();
+  const { items, loading } = useSelector((state: RootState) => state.cart);
 
   useEffect(() => {
-    if (userId) {
-      dispatch(fetchCart(Number(userId)));
-    }
-  }, [dispatch, userId]);
+    dispatch(fetchCart());
+  }, [dispatch]);
 
-  const handleRemove = (id: number) => {
-    dispatch(removeItem(id));
+  const handleAdd = (productId: number) => {
+    dispatch(addToCart({ productId, quantity: 1 }));
   };
 
-  const handleUpdate = (id: number, quantity: number) => {
-    if (quantity > 0) {
-      dispatch(updateItem({ cartItemId: id, quantity }));
+  const handleRemove = (productId: number) => {
+    const item = items.find((i) => i.productId === productId);
+    if (!item) return;
+    if (item.quantity > 1) {
+      dispatch(addToCart({ productId, quantity: -1 }));
+    } else {
+      dispatch(removeFromCart(item.id));
     }
+  };
+
+  const handleDelete = (cartItemId: number) => {
+    dispatch(removeFromCart(cartItemId));
   };
 
   const handleClear = () => {
-    if (userId) {
-      dispatch(clearCart(Number(userId)));
-    }
+    dispatch(clearCart());
   };
+
+  const totalPrice = items.reduce(
+    (sum, item) => sum + item.quantity * item.product.price,
+    0
+  );
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>🛒 Ваша корзина</h2>
+      <h2>Корзина</h2>
       {items.length === 0 ? (
         <p>Корзина пуста</p>
       ) : (
         <>
           <ul>
-            {items.map((item: any) => (
+            {items.map((item) => (
               <li key={item.id} style={{ marginBottom: "10px" }}>
-                <strong>{item.product.name}</strong> — {item.quantity} шт.
                 <div>
-                  <button onClick={() => handleUpdate(item.id, item.quantity - 1)}>-</button>
-                  <button onClick={() => handleUpdate(item.id, item.quantity + 1)}>+</button>
-                  <button onClick={() => handleRemove(item.id)}>Удалить</button>
+                  <strong>{item.product.name}</strong> — ${item.product.price} ×{" "}
+                  {item.quantity}
+                </div>
+                <div>
+                  <button onClick={() => handleAdd(item.productId)}>+</button>
+                  <button onClick={() => handleRemove(item.productId)}>-</button>
+                  <button onClick={() => handleDelete(item.id)}>Удалить</button>
                 </div>
               </li>
             ))}
           </ul>
+          <p>
+            <strong>Итого: ${totalPrice.toFixed(2)}</strong>
+          </p>
           <button onClick={handleClear}>Очистить корзину</button>
         </>
       )}
     </div>
   );
-}
+};
+
+export default Cart;

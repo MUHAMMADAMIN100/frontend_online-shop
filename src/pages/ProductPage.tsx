@@ -1,49 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../app/store";
 import { addToCart } from "../features/cart/cartSlice";
-import type { AppDispatch } from '../app/store';
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
-}
-
 
 export default function ProductPage() {
-  const { id } = useParams();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { id } = useParams<{ id: string }>();
+  const [product, setProduct] = useState<any>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const token = useSelector((state: RootState) => state.auth.token);
 
   useEffect(() => {
-    if (id) {
-      axios
-        .get(`http://localhost:3001/products/${id}`)
-        .then((res) => {
-          setProduct(res.data);
-        })
-        .catch((err) => console.error(err))
-        .finally(() => setLoading(false));
-    }
+    axios.get(`http://localhost:3001/products/${id}`)
+      .then(res => setProduct(res.data))
+      .catch(err => console.error(err));
   }, [id]);
 
-  if (loading) return <p>Загрузка...</p>;
-  if (!product) return <p>Продукт не найден</p>;
+  const handleAdd = () => {
+    if (!token) return alert("Войдите, чтобы добавить в корзину");
+    dispatch(addToCart({ productId: product.id, quantity: 1 }));
+  };
+
+  if (!product) return <div>Загрузка...</div>;
 
   return (
-    <div className="p-6">
-      <h1 className="font-bold text-2xl">{product.name}</h1>
-      <p>{product.description}</p>
-      <p className="font-semibold text-lg">{product.price} $</p>
-      {product.image && (
-        <img src={product.image} alt={product.name} className="mt-4 w-64" />
-      )}
+    <div className="flex md:flex-row flex-col gap-6 p-6">
+      <img src={product.image || "https://via.placeholder.com/300"} alt={product.name} className="rounded-lg w-full md:w-1/2 h-auto"/>
+      <div className="flex-1">
+        <h2 className="mb-4 font-bold text-3xl">{product.name}</h2>
+        <p className="mb-4">{product.description}</p>
+        <p className="mb-4 font-bold text-2xl">{product.price} $</p>
+        <button onClick={handleAdd} className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-white transition">
+          🛒 В корзину
+        </button>
+      </div>
     </div>
   );
 }
-
