@@ -1,159 +1,246 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import type { RootState } from "../../app/store";
-import jwt_decode from "jwt-decode";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
+import axios from "axios"
+import type { RootState } from "../../app/store"
+import jwt_decode from "jwt-decode"
 
-const API_URL = "http://localhost:3001/cart";
+const API_URL = "http://localhost:3001/cart"
 
-// функция для извлечения userId из токена (если надо где-то ещё)
 const getUserIdFromToken = (token: string | null): number | null => {
-  if (!token) return null;
+  if (!token) return null
   try {
-    const decoded: any = jwt_decode(token);
-    return decoded.userId ?? null;
+    const decoded: any = jwt_decode(token)
+    return decoded.userId ?? null
   } catch {
-    return null;
+    return null
   }
-};
+}
 
-// ================== THUNKS ==================
+const validateToken = (token: string | null): boolean => {
+  if (!token) {
+    console.log("[v0] No token found")
+    return false
+  }
 
-// Получить корзину
-export const fetchCart = createAsyncThunk(
-  "cart/fetchCart",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    const token = state.auth.token;
-    if (!token) throw new Error("Unauthorized");
+  try {
+    const decoded: any = jwt_decode(token)
+    const currentTime = Date.now() / 1000
 
-    console.log("=== fetchCart called ===", { token });
+    if (decoded.exp && decoded.exp < currentTime) {
+      console.log("[v0] Token expired")
+      return false
+    }
 
-    const res = await axios.get(`${API_URL}`, {
+    console.log("[v0] Token valid, userId:", decoded.userId)
+    return true
+  } catch (error) {
+    console.log("[v0] Token validation error:", error)
+    return false
+  }
+}
+
+export const fetchCart = createAsyncThunk("cart/fetchCart", async (_, { getState, rejectWithValue }) => {
+  try {
+    const state = getState() as RootState
+    const token = state.auth.token
+    const userId = getUserIdFromToken(token)
+
+    if (!validateToken(token) || !userId) {
+      return rejectWithValue("Invalid or expired token")
+    }
+
+    const res = await axios.get(`${API_URL}/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
-    });
-    return res.data; // сервер возвращает cart с items
-  }
-);
+      timeout: 10000,
+    })
 
-// Добавить товар в корзину
+    return res.data
+  } catch (error: any) {
+    console.log("[v0] fetchCart error:", error.response?.status, error.message)
+    return rejectWithValue(error.response?.data?.message || error.message)
+  }
+})
+
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async (
-    { productId, quantity }: { productId: number; quantity: number },
-    { getState }
-  ) => {
-    const state = getState() as RootState;
-    const token = state.auth.token;
+  async ({ productId, quantity }: { productId: number; quantity: number }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState
+      const token = state.auth.token
 
-    console.log("=== addToCart called ===");
-    console.log("token:", token);
-    console.log("productId:", productId, "quantity:", quantity);
+      if (!validateToken(token)) {
+        return rejectWithValue("Invalid or expired token")
+      }
 
-    if (!token) throw new Error("Unauthorized");
+      const res = await axios.post(
+        `${API_URL}/add`,
+        { productId, quantity },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          timeout: 10000,
+        },
+      )
 
-    const res = await axios.post(
-      `${API_URL}/add`,
-      { productId, quantity }, // ⚡ userId не нужен — берётся из токена
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      console.log("[v0] addToCart success:", res.data)
+      return res.data
+    } catch (error: any) {
+      console.log("[v0] addToCart error:", error.response?.status, error.message)
 
-    console.log("=== addToCart response ===", res.data);
+      if (error.response?.status === 404) {
+        return rejectWithValue("Cart endpoint not found. Please check if the backend server is running.")
+      } else if (error.response?.status === 401) {
+        return rejectWithValue("Unauthorized. Please log in again.")
+      } else if (error.code === "ECONNREFUSED") {
+        return rejectWithValue("Cannot connect to server. Please check if the backend is running.")
+      }
 
-    return res.data;
-  }
-);
+      return rejectWithValue(error.response?.data?.message || error.message)
+    }
+  },
+)
 
-// Удалить товар
+
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async (cartItemId: number, { getState }) => {
-    const state = getState() as RootState;
-    const token = state.auth.token;
-    if (!token) throw new Error("Unauthorized");
+  async (cartItemId: number, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState
+      const token = state.auth.token
 
-    console.log("=== removeFromCart called ===", { cartItemId });
+      if (!validateToken(token)) {
+        return rejectWithValue("Invalid or expired token")
+      }
 
-    await axios.delete(`${API_URL}/remove/${cartItemId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      await axios.delete(`${API_URL}/remove/${cartItemId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 10000,
+      })
 
-    return cartItemId;
-  }
-);
+      return cartItemId
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message)
+    }
+  },
+)
 
-// Очистить корзину
-export const clearCart = createAsyncThunk(
-  "cart/clearCart",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    const token = state.auth.token;
-    const userId = getUserIdFromToken(token);
-    if (!token || !userId) throw new Error("Unauthorized");
+export const clearCart = createAsyncThunk("cart/clearCart", async (_, { getState, rejectWithValue }) => {
+  try {
+    const state = getState() as RootState
+    const token = state.auth.token
+    const userId = getUserIdFromToken(token)
 
-    console.log("=== clearCart called ===", { userId });
+    if (!validateToken(token) || !userId) {
+      return rejectWithValue("Invalid or expired token")
+    }
 
     await axios.delete(`${API_URL}/clear/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
-    });
+      timeout: 10000,
+    })
 
-    return [];
+    return []
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || error.message)
   }
-);
+})
 
-// ================== SLICE ==================
 interface CartItem {
-  id: number;
-  productId: number;
-  quantity: number;
+  id: number
+  productId: number
+  quantity: number
   product: {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-    image?: string;
-  };
+    id: number
+    name: string
+    description: string
+    price: number
+    image?: string
+  }
 }
 
 interface CartState {
-  items: CartItem[];
-  loading: boolean;
-  error: string | null;
+  items: CartItem[]
+  loading: boolean
+  error: string | null
 }
 
 const initialState: CartState = {
   items: [],
   loading: false,
   error: null,
-};
+}
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null
+    },
+  },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchCart.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
       .addCase(fetchCart.fulfilled, (state, action) => {
-        console.log("=== fetchCart.fulfilled ===", action.payload);
-        state.items = action.payload.items || [];
+        state.loading = false
+        state.items = action.payload.items || []
+        state.error = null
+      })
+      .addCase(fetchCart.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+      .addCase(addToCart.pending, (state) => {
+        state.loading = true
+        state.error = null
       })
       .addCase(addToCart.fulfilled, (state, action) => {
-        const item = action.payload;
-        const existing = state.items.find((i) => i.productId === item.productId);
+        state.loading = false
+        const item = action.payload
+        const existing = state.items.find((i) => i.productId === item.productId)
         if (existing) {
-          existing.quantity = item.quantity; // сервер вернул актуальное значение
+          existing.quantity = item.quantity
         } else {
-          state.items.push(item);
+          state.items.push(item)
         }
+        state.error = null
+      })
+      .addCase(addToCart.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+      .addCase(removeFromCart.pending, (state) => {
+        state.loading = true
+        state.error = null
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
-        console.log("=== removeFromCart.fulfilled ===", action.payload);
-        state.items = state.items.filter((i) => i.id !== action.payload);
+        state.loading = false
+        state.items = state.items.filter((i) => i.id !== action.payload)
+        state.error = null
+      })
+      .addCase(removeFromCart.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+      .addCase(clearCart.pending, (state) => {
+        state.loading = true
+        state.error = null
       })
       .addCase(clearCart.fulfilled, (state) => {
-        console.log("=== clearCart.fulfilled ===");
-        state.items = [];
-      });
+        state.loading = false
+        state.items = []
+        state.error = null
+      })
+      .addCase(clearCart.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
   },
-});
+})
 
-export default cartSlice.reducer;
+export const { clearError } = cartSlice.actions
+export default cartSlice.reducer

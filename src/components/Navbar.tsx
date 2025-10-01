@@ -15,7 +15,7 @@ export default function Navbar() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate("/cart")}
-          className="relative bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white"
+          className="relative bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white cursor-pointer"
         >
           🛒 Корзина
           {totalCount > 0 && (

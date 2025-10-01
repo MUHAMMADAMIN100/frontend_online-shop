@@ -23,7 +23,6 @@ const initialState: ProductsState = {
   error: null,
 };
 
-// payload аргумент — объект фильтров (все опционально)
 export const fetchProducts = createAsyncThunk<Product[], { category?: string; minPrice?: number; maxPrice?: number; search?: string } | void>(
   'products/fetch',
   async (filters) => {

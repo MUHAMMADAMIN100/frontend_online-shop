@@ -23,7 +23,6 @@ const ProductForm = () => {
     category: '',
   });
 
-  // Если редактируем товар, подгружаем его данные
   useEffect(() => {
     if (id) {
       axios
