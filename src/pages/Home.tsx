@@ -79,7 +79,7 @@ export default function Home() {
         <select value={category} onChange={e => setCategory(e.target.value)} className="p-2 border rounded-lg cursor-pointer">
           <option value="">Все категории</option>
           <option value="Кроссовки">Кроссовки</option>
-          <option value="Футболки">Одежда</option>
+          <option value="Футболки">Футболки</option>
           <option value="Шорты">Шорты</option>
         </select>
         <input type="number" placeholder="Цена от" value={minPrice} onChange={e => setMinPrice(e.target.value)} className="p-2 border rounded-lg w-28"/>
