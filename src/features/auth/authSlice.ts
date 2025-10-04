@@ -1,13 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit"
 import type { PayloadAction } from "@reduxjs/toolkit"
+
 interface AuthState {
   token: string | null
   role: string | null
 }
 
+// Сначала пробуем загрузить данные из localStorage
+const tokenFromStorage = localStorage.getItem("token")
+const roleFromStorage = localStorage.getItem("role")
+
 const initialState: AuthState = {
-  token: null, 
-  role: null,
+  token: tokenFromStorage ?? null,
+  role: roleFromStorage ?? null,
 }
 
 const authSlice = createSlice({
@@ -38,3 +43,8 @@ const authSlice = createSlice({
 
 export const { setCredentials, logout, syncFromStorage } = authSlice.actions
 export default authSlice.reducer
+
+window.addEventListener("beforeunload", () => {
+  localStorage.removeItem("token")
+  localStorage.removeItem("role")
+})
