@@ -24,27 +24,26 @@ export default function App() {
   const cartError = useSelector((state: RootState) => state.cart.error)
 
   useEffect(() => {
-    console.log("[v0] App mounting, syncing from storage")
+    console.log("App mounting, syncing from storage")
     dispatch(syncFromStorage())
   }, [dispatch])
 
   useEffect(() => {
     if (token) {
-      console.log("[v0] Token found, loading cart after delay")
-      // Small delay to ensure backend is ready
+      console.log("Token found, loading cart after delay")
       const timer = setTimeout(async () => {
         try {
           await dispatch(fetchCart()).unwrap()
-          console.log("[v0] Cart loaded successfully")
+          console.log("[Cart loaded successfully")
         } catch (error: any) {
-          console.log("[v0] Failed to load cart:", error)
+          console.log("Failed to load cart:", error)
           if (error.includes("не найдена") || error.includes("not found")) {
-            console.log("[v0] Cart not found, attempting to create new cart")
+            console.log(" Cart not found, attempting to create new cart")
             try {
               await dispatch(createCart()).unwrap()
-              console.log("[v0] New cart created successfully")
+              console.log("New cart created successfully")
             } catch (createError) {
-              console.log("[v0] Failed to create cart:", createError)
+              console.log("Failed to create cart:", createError)
             }
           }
         }
@@ -52,25 +51,19 @@ export default function App() {
 
       return () => clearTimeout(timer)
     } else {
-      console.log("[v0] No token found, skipping cart load")
+      console.log("No token found, skipping cart load")
     }
   }, [token, dispatch])
 
   useEffect(() => {
     if (cartError) {
-      console.log("[v0] Cart error occurred:", cartError)
-      // You can show a toast notification here if you have one
+      console.log("Cart error occurred:", cartError)
     }
   }, [cartError])
 
   return (
     <div className="bg-gray-50 min-h-screen">
       <Navbar />
-      {cartError && (
-        <div className="bg-red-100 mx-4 mt-4 px-4 py-3 border border-red-400 rounded text-red-700">
-          <strong>Cart Error:</strong> {cartError}
-        </div>
-      )}
       <main className="mx-auto p-4 container">
         <Routes>
           <Route path="/" element={<Home />} />

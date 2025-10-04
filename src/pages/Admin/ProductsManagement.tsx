@@ -20,18 +20,18 @@ const ProductsManagement: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
-  // форма
+  // Форма
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [category, setCategory] = useState("");
 
-  // модалки
+  // Модалки
   const [modalMessage, setModalMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  // подтверждение удаления
+  // Подтверждение удаления
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -80,6 +80,16 @@ const ProductsManagement: React.FC = () => {
     }
   };
 
+  // Сброс формы
+  const resetForm = () => {
+    setEditingProductId(null);
+    setName("");
+    setPrice("");
+    setDescription("");
+    setImageUrl("");
+    setCategory("");
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !price || !category) {
@@ -92,12 +102,14 @@ const ProductsManagement: React.FC = () => {
     try {
       let response: Response;
       if (editingProductId) {
+        // Редактирование
         response = await fetch(`http://localhost:3001/admin/products/${editingProductId}`, {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
       } else {
+        // Создание
         response = await fetch("http://localhost:3001/admin/products", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -109,11 +121,11 @@ const ProductsManagement: React.FC = () => {
         const updatedProduct = await response.json();
         if (editingProductId) {
           setProducts(products.map((p) => (p.id === editingProductId ? updatedProduct : p)));
-          setEditingProductId(null);
         } else {
           setProducts([...products, updatedProduct]);
         }
-        setName(""); setPrice(""); setDescription(""); setImageUrl(""); setCategory(""); setShowForm(false);
+        resetForm();
+        setShowForm(false);
         showDialog(editingProductId ? "Товар обновлен" : "Товар добавлен");
       } else {
         const err = await response.text();
@@ -142,15 +154,20 @@ const ProductsManagement: React.FC = () => {
     <div className="relative bg-white shadow p-6 rounded-lg">
       <h2 className="mb-4 font-semibold text-gray-900 text-xl">Управление товарами</h2>
 
+      {/* Кнопка добавить */}
       {!showForm && (
         <button
-          onClick={() => setShowForm(true)}
+          onClick={() => {
+            resetForm();
+            setShowForm(true);
+          }}
           className="bg-blue-600 hover:bg-blue-700 mb-4 px-4 py-2 rounded text-white cursor-pointer"
         >
           Добавить товар
         </button>
       )}
 
+      {/* Форма */}
       {showForm && (
         <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/30">
           <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-lg scale-95 animate-scaleUp">
@@ -158,12 +175,38 @@ const ProductsManagement: React.FC = () => {
               {editingProductId ? "Редактирование товара" : "Добавление товара"}
             </h3>
             <form onSubmit={handleFormSubmit} className="space-y-4">
-              <input type="text" placeholder="Название" value={name} onChange={(e) => setName(e.target.value)} className="p-2 border rounded w-full" />
-              <input type="number" placeholder="Цена" value={price} onChange={(e) => setPrice(e.target.value)} className="p-2 border rounded w-full" />
-              <textarea placeholder="Описание" value={description} onChange={(e) => setDescription(e.target.value)} className="p-2 border rounded w-full" />
-              <input type="text" placeholder="URL картинки" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="p-2 border rounded w-full" />
-
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 border rounded w-full">
+              <input
+                type="text"
+                placeholder="Название"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="p-2 border rounded w-full"
+              />
+              <input
+                type="number"
+                placeholder="Цена"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="p-2 border rounded w-full"
+              />
+              <textarea
+                placeholder="Описание"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="p-2 border rounded w-full"
+              />
+              <input
+                type="text"
+                placeholder="URL картинки"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className="p-2 border rounded w-full"
+              />
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="p-2 border rounded w-full"
+              >
                 <option value="">Выберите категорию</option>
                 <option value="Футболки">Футболки</option>
                 <option value="Кроссовки">Кроссовки</option>
@@ -171,10 +214,20 @@ const ProductsManagement: React.FC = () => {
               </select>
 
               <div className="flex justify-between gap-2 mt-3">
-                <button type="submit" className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold text-white cursor-pointer">
+                <button
+                  type="submit"
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold text-white cursor-pointer"
+                >
                   {editingProductId ? "Сохранить" : "Добавить"}
                 </button>
-                <button type="button" onClick={() => setShowForm(false)} className="bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white cursor-pointer">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForm(false);
+                    resetForm();
+                  }}
+                  className="bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white cursor-pointer"
+                >
                   Отмена
                 </button>
               </div>
@@ -183,7 +236,7 @@ const ProductsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Модальный диалог */}
+      {/* Модалки */}
       {showModal && (
         <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/20">
           <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-sm text-center scale-95 animate-scaleUp">
@@ -198,7 +251,7 @@ const ProductsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* ✅ Модалка подтверждения удаления */}
+      {/* Подтверждение удаления */}
       {confirmDeleteId !== null && (
         <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/20">
           <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-sm text-center scale-95 animate-scaleUp">
@@ -221,6 +274,7 @@ const ProductsManagement: React.FC = () => {
         </div>
       )}
 
+      {/* Таблица товаров */}
       <div className="overflow-x-auto">
         <table className="divide-y divide-gray-200 min-w-full">
           <thead className="bg-gray-50">
@@ -242,10 +296,16 @@ const ProductsManagement: React.FC = () => {
                 <td className="px-6 py-4">{product.price}₽</td>
                 <td className="px-6 py-4 max-w-xs truncate">{product.description}</td>
                 <td className="px-6 py-4">{product.category}</td>
-                <td className="px-6 py-4">{product.image ? <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" /> : "—"}</td>
+                <td className="px-6 py-4">
+                  {product.image ? <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" /> : "—"}
+                </td>
                 <td className="flex gap-2 px-6 py-4">
-                  <button onClick={() => startEditing(product)} className="text-blue-600 hover:text-blue-900 cursor-pointer">Редактировать</button>
-                  <button onClick={() => setConfirmDeleteId(product.id)} className="text-red-600 hover:text-red-900 cursor-pointer">Удалить</button>
+                  <button onClick={() => startEditing(product)} className="text-blue-600 hover:text-blue-900 cursor-pointer">
+                    Редактировать
+                  </button>
+                  <button onClick={() => setConfirmDeleteId(product.id)} className="text-red-600 hover:text-red-900 cursor-pointer">
+                    Удалить
+                  </button>
                 </td>
               </tr>
             ))}

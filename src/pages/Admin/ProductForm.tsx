@@ -23,14 +23,22 @@ const ProductForm = () => {
     category: '',
   });
 
-  useEffect(() => {
-    if (id) {
-      axios
-        .get(`http://localhost:3001/products/${id}`)
-        .then((res) => setProduct(res.data))
-        .catch((err) => console.error(err));
-    }
-  }, [id]);
+useEffect(() => {
+  if (id) {
+    axios
+      .get(`http://localhost:3001/products/${id}`)
+      .then((res) => setProduct(res.data))
+      .catch((err) => console.error(err));
+  } else {
+    setProduct({
+      name: "",
+      description: "",
+      price: 0,
+      image: "",
+      category: "",
+    });
+  }
+}, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

@@ -6,7 +6,7 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  token: null, // по умолчанию null
+  token: null, 
   role: null,
 }
 

@@ -76,7 +76,7 @@ export default function Home() {
           onChange={e => setSearch(e.target.value)} 
           className="flex-1 p-2 border rounded-lg focus:outline-blue-500"
         />
-        <select value={category} onChange={e => setCategory(e.target.value)} className="p-2 border rounded-lg">
+        <select value={category} onChange={e => setCategory(e.target.value)} className="p-2 border rounded-lg cursor-pointer">
           <option value="">Все категории</option>
           <option value="Кроссовки">Кроссовки</option>
           <option value="Футболки">Одежда</option>
@@ -103,7 +103,7 @@ export default function Home() {
               <div className="p-4">
                 <h3 className="font-bold text-blue-800 text-xl">{product.name}</h3>
                 <p className="mt-1 text-gray-600">{product.description}</p>
-                <p className="mt-2 font-extrabold text-green-600 text-2xl">{product.price} $</p>
+                <p className="mt-2 font-extrabold text-green-600 text-2xl">{product.price} ₽</p>
               </div>
             </Link>
             <button 
