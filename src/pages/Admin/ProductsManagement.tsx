@@ -1,8 +1,13 @@
-import type React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import { FiEdit, FiTrash2, FiPlus, FiCheck, FiX } from "react-icons/fi"; // иконки
+import {
+  FiEdit as FiEditIcon,
+  FiTrash2 as FiTrash2Icon,
+  FiPlus as FiPlusIcon,
+  FiCheck as FiCheckIcon,
+  FiX as FiXIcon
+} from "react-icons/fi"; // иконки с корректной типизацией
 
 interface Product {
   id: number;
@@ -154,7 +159,7 @@ const ProductsManagement: React.FC = () => {
           onClick={() => { resetForm(); setShowForm(true); }}
           className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 mb-4 px-4 py-2 rounded-lg text-white"
         >
-          <FiPlus /> Добавить
+          <FiPlusIcon /> Добавить
         </button>
       )}
 
@@ -177,10 +182,10 @@ const ProductsManagement: React.FC = () => {
               </select>
               <div className="flex justify-between gap-2">
                 <button type="submit" className="flex items-center gap-1 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-white">
-                  <FiCheck /> {editingProductId ? "Сохранить" : "Добавить"}
+                  <FiCheckIcon /> {editingProductId ? "Сохранить" : "Добавить"}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="flex items-center gap-1 bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white">
-                  <FiX /> Отмена
+                  <FiXIcon /> Отмена
                 </button>
               </div>
             </form>
@@ -194,7 +199,7 @@ const ProductsManagement: React.FC = () => {
           <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-sm text-center scale-95 animate-scaleUp">
             <p className="text-gray-800">{modalMessage}</p>
             <button onClick={() => setShowModal(false)} className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 mt-4 px-4 py-2 rounded-lg text-white">
-              <FiCheck /> Ок
+              <FiCheckIcon /> Ок
             </button>
           </div>
         </div>
@@ -206,10 +211,10 @@ const ProductsManagement: React.FC = () => {
             <p className="mb-4 text-gray-800">Вы уверены, что хотите удалить этот товар?</p>
             <div className="flex justify-center gap-4">
               <button onClick={() => deleteProduct(confirmDeleteId)} className="flex items-center gap-1 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white">
-                <FiTrash2 /> Да
+                <FiTrash2Icon /> Да
               </button>
               <button onClick={() => setConfirmDeleteId(null)} className="flex items-center gap-1 bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white">
-                <FiX /> Нет
+                <FiXIcon /> Нет
               </button>
             </div>
           </div>
@@ -242,10 +247,10 @@ const ProductsManagement: React.FC = () => {
                 </td>
                 <td className="flex gap-2 px-6 py-4">
                   <button onClick={() => startEditing(product)} className="flex items-center gap-1 text-blue-600 hover:text-blue-900 cursor-pointer">
-                    <FiEdit />
+                    <FiEditIcon />
                   </button>
                   <button onClick={() => setConfirmDeleteId(product.id)} className="flex items-center gap-1 text-red-600 hover:text-red-900 cursor-pointer">
-                    <FiTrash2 />
+                    <FiTrash2Icon />
                   </button>
                 </td>
               </tr>

@@ -5,7 +5,7 @@ export default function CartDebugPanel() {
   const token = useSelector((state: RootState) => state.auth.token)
   const cartState = useSelector((state: RootState) => state.cart)
 
-  if (process.env.NODE_ENV !== "development") {
+  if (import.meta.env.MODE !== "development") {
     return null
   }
 
