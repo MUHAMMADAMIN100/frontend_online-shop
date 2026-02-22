@@ -11,7 +11,7 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "./app/store";
-import { fetchCart, createCart } from "./features/cart/cartSlice";
+import { fetchCart, clearCart } from "./features/cart/cartSlice";
 import { syncFromStorage } from "./features/auth/authSlice";
 import OrdersHistory from "./pages/OrdersHistory";
 
@@ -20,11 +20,13 @@ export default function App() {
   const token = useSelector((state: RootState) => state.auth.token);
   const cartError = useSelector((state: RootState) => state.cart.error);
 
+  // Синхронизация авторизации
   useEffect(() => {
     console.log("App mounting, syncing from storage");
     dispatch(syncFromStorage());
   }, [dispatch]);
 
+  // Загрузка корзины при наличии токена
   useEffect(() => {
     if (!token) {
       console.log("No token found, skipping cart load");
@@ -39,23 +41,16 @@ export default function App() {
       } catch (error: unknown) {
         console.log("Failed to load cart:", error);
 
-        const errMsg = typeof error === "string" ? error : JSON.stringify(error);
-
-        if (errMsg.includes("не найдена") || errMsg.includes("not found")) {
-          console.log("Cart not found, attempting to create new cart");
-          try {
-            await dispatch(createCart()).unwrap();
-            console.log("New cart created successfully");
-          } catch (createError: unknown) {
-            console.log("Failed to create cart:", createError);
-          }
-        }
+        // Инициализация пустой корзины при ошибке
+        dispatch(clearCart());
+        console.log("Cart initialized as empty");
       }
     }, 500);
 
     return () => clearTimeout(timer);
   }, [token, dispatch]);
 
+  // Логирование ошибок корзины
   useEffect(() => {
     if (cartError) {
       console.log("Cart error occurred:", cartError);

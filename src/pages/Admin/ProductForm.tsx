@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FiSave as FiSaveIcon } from "react-icons/fi"; // иконка сохранения с правильным типом
+import { FiSave } from "react-icons/fi";
+import type { IconType } from "react-icons";
 
 interface Product {
   id?: number;
@@ -11,6 +12,10 @@ interface Product {
   image: string;
   category: string;
 }
+
+const Icon: React.FC<{ icon: IconType; size?: number }> = ({ icon: IconComponent, size }) => {
+  return <IconComponent size={size} />;
+};
 
 const ProductForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,20 +37,10 @@ const ProductForm: React.FC = () => {
         .get(`https://backend-online-shop-vrxj.onrender.com/products/${id}`)
         .then((res) => setProduct(res.data))
         .catch((err) => console.error(err));
-    } else {
-      setProduct({
-        name: "",
-        description: "",
-        price: 0,
-        image: "",
-        category: "",
-      });
     }
   }, [id]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setProduct((prev) => ({
       ...prev,
@@ -164,7 +159,7 @@ const ProductForm: React.FC = () => {
             disabled={loading}
             className="flex justify-center items-center bg-green-600 hover:bg-green-700 shadow-lg p-3 rounded-full text-white hover:scale-110 transition transform"
           >
-            <FiSaveIcon size={24} />
+            <Icon icon={FiSave} size={24} />
           </button>
         </div>
       </form>
