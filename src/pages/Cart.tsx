@@ -27,24 +27,15 @@ const Cart: React.FC = () => {
     dispatch(fetchCart());
   }, [dispatch]);
 
-  const handleAdd = (productId: number) => {
-    dispatch(addToCart({ productId, quantity: 1 }));
-  };
-
+  const handleAdd = (productId: number) => dispatch(addToCart({ productId, quantity: 1 }));
   const handleRemove = (productId: number) => {
     const item = items.find((i) => i.productId === productId);
     if (!item) return;
-    if (item.quantity > 1) {
-      dispatch(addToCart({ productId, quantity: -1 }));
-    } else {
-      dispatch(removeFromCart(item.id));
-    }
+    item.quantity > 1
+      ? dispatch(addToCart({ productId, quantity: -1 }))
+      : dispatch(removeFromCart(item.id));
   };
-
-  const handleDelete = (cartItemId: number) => {
-    dispatch(removeFromCart(cartItemId));
-  };
-
+  const handleDelete = (cartItemId: number) => dispatch(removeFromCart(cartItemId));
   const handleClear = () => {
     Swal.fire({
       title: "Вы уверены?",
@@ -63,10 +54,7 @@ const Cart: React.FC = () => {
     });
   };
 
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.quantity * item.product.price,
-    0
-  );
+  const totalPrice = items.reduce((sum, item) => sum + item.quantity * item.product.price, 0);
 
   const handleCheckout = async () => {
     if (!name || !phone || !address) {
@@ -79,35 +67,22 @@ const Cart: React.FC = () => {
     }
     setOrderLoading(true);
     try {
-      const response = await fetch("http://localhost:3001/orders", {
+      const response = await fetch("https://backend-online-shop-vrxj.onrender.com/orders", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           customerName: name,
           phone,
           address,
-          items: items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-          })),
+          items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
         }),
       });
       if (response.ok) {
-        Swal.fire({
-          icon: "success",
-          title: "Заказ успешно создан!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        Swal.fire({ icon: "success", title: "Заказ успешно создан!", showConfirmButton: false, timer: 1500 });
         dispatch(clearCart());
         setShowCheckout(false);
         setOrderCompleted(true);
-        setName("");
-        setPhone("");
-        setAddress("");
+        setName(""); setPhone(""); setAddress("");
       } else {
         const errorText = await response.text();
         console.error(errorText);
@@ -122,145 +97,134 @@ const Cart: React.FC = () => {
   };
 
   if (loading)
-    return (
-      <p className="mt-10 text-gray-500 text-lg text-center">Loading...</p>
-    );
+    return <p className="mt-10 text-gray-500 text-lg text-center">Loading...</p>;
 
   return (
-    <div className="relative mx-auto p-6 max-w-5xl">
-      <h2 className="mb-6 font-bold text-blue-700 text-3xl text-center">
-        🛒 Корзина
-      </h2>
+    <div className="relative mx-auto p-6 max-w-6xl">
+      <h2 className="drop-shadow-lg mb-8 font-extrabold text-blue-900 text-4xl text-center">🛒 Корзина</h2>
 
       {items.length === 0 && !orderCompleted ? (
         <p className="text-gray-600 text-xl text-center">Корзина пуста</p>
       ) : (
         <>
           {items.length > 0 && (
-            <>
-              <ul className="space-y-4">
-                {items.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex md:flex-row flex-col justify-between items-center bg-white shadow-md hover:shadow-xl p-4 rounded-xl hover:scale-102 transition transform"
-                  >
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={item.product.image || "https://via.placeholder.com/80"}
-                        alt={item.product.name}
-                        className="rounded-lg w-20 h-20 object-cover hover:scale-105 transition-transform"
-                      />
-                      <div>
-                        <h3 className="font-semibold text-blue-800 text-lg">
-                          {item.product.name}
-                        </h3>
-                        <p className="text-gray-500">{item.product.price}₽</p>
-                        <p className="mt-1 text-gray-600">Кол-во: {item.quantity}</p>
-                      </div>
+            <ul className="space-y-6">
+              {items.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex md:flex-row flex-col justify-between items-center bg-white shadow-xl hover:shadow-2xl p-5 rounded-3xl hover:scale-105 transition-transform transform"
+                >
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={item.product.image || "https://via.placeholder.com/100"}
+                      alt={item.product.name}
+                      className="rounded-2xl w-24 h-24 object-cover hover:scale-110 transition-transform"
+                    />
+                    <div>
+                      <h3 className="font-bold text-blue-900 text-lg">{item.product.name}</h3>
+                      <p className="font-extrabold text-green-600">{item.product.price} ₽</p>
+                      <p className="text-gray-500">Кол-во: {item.quantity}</p>
                     </div>
+                  </div>
 
-                    <div className="flex gap-2 mt-3 md:mt-0">
-                      <button
-                        onClick={() => handleAdd(item.productId)}
-                        className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-white hover:scale-105 transition cursor-pointer transform"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => handleRemove(item.productId)}
-                        className="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg text-white hover:scale-105 transition cursor-pointer transform"
-                      >
-                        -
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-white hover:scale-105 transition cursor-pointer transform"
-                      >
-                        Удалить
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="flex md:flex-row flex-col justify-between items-center gap-2 bg-gray-100 shadow-md mt-6 p-4 rounded-xl">
-                <p className="font-semibold text-xl">Итого: {totalPrice.toFixed(2)}₽</p>
-                <div className="flex gap-2 mt-2 md:mt-0">
-                  <button
-                    onClick={() => setShowCheckout(true)}
-                    className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold text-white hover:scale-105 transition cursor-pointer transform"
-                  >
-                    Оформить заказ
-                  </button>
-                  <button
-                    onClick={handleClear}
-                    className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-semibold text-white hover:scale-105 transition cursor-pointer transform"
-                  >
-                    Очистить корзину
-                  </button>
-                </div>
-              </div>
-            </>
+                  <div className="flex gap-2 mt-3 md:mt-0">
+                    <button
+                      onClick={() => handleAdd(item.productId)}
+                      className="bg-gradient-to-r from-green-500 hover:from-green-600 to-green-600 hover:to-green-700 px-5 py-2 rounded-2xl font-semibold text-white hover:scale-105 transition-transform cursor-pointer transform"
+                    >
+                      +
+                    </button>
+                    <button
+                      onClick={() => handleRemove(item.productId)}
+                      className="bg-gradient-to-r from-yellow-400 hover:from-yellow-500 to-yellow-500 hover:to-yellow-600 px-5 py-2 rounded-2xl font-semibold text-white hover:scale-105 transition-transform cursor-pointer transform"
+                    >
+                      -
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="bg-gradient-to-r from-red-500 hover:from-red-600 to-red-600 hover:to-red-700 px-5 py-2 rounded-2xl font-semibold text-white hover:scale-105 transition-transform cursor-pointer transform"
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
+
+          {/* Итого и действия */}
+          <div className="flex md:flex-row flex-col justify-between items-center gap-4 bg-gray-100 shadow-lg mt-8 p-5 rounded-2xl">
+            <p className="font-extrabold text-blue-900 text-xl">Итого: {totalPrice.toFixed(2)} ₽</p>
+            <div className="flex sm:flex-row flex-col gap-3 w-full sm:w-auto">
+              <button
+                onClick={() => setShowCheckout(true)}
+                className="bg-gradient-to-r from-blue-600 hover:from-blue-700 to-blue-800 hover:to-blue-900 px-6 py-3 rounded-2xl font-bold text-white hover:scale-105 transition-transform transform"
+              >
+                Оформить заказ
+              </button>
+              <button
+                onClick={handleClear}
+                className="bg-gradient-to-r from-red-500 hover:from-red-600 to-red-600 hover:to-red-700 px-6 py-3 rounded-2xl font-bold text-white hover:scale-105 transition-transform transform"
+              >
+                Очистить корзину
+              </button>
+            </div>
+          </div>
         </>
       )}
 
-      {/* Модальное окно */}
-     {/* Модальное окно */}
-{showCheckout && (
-  <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/20 animate-fadeIn">
-    <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-md animate-scaleUp">
-      <h3 className="mb-4 font-semibold text-blue-800 text-2xl text-center">
-        Форма заказа
-      </h3>
-      <div className="flex flex-col gap-3">
-        <input
-          type="text"
-          placeholder="Имя"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="p-2 border rounded focus:outline-blue-500 w-full"
-        />
-        <input
-          type="text"
-          placeholder="Телефон"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="p-2 border rounded focus:outline-blue-500 w-full"
-        />
-        <input
-          type="text"
-          placeholder="Адрес"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className="p-2 border rounded focus:outline-blue-500 w-full"
-        />
-        <div className="flex justify-between gap-2 mt-3">
-          <button
-            onClick={handleCheckout}
-            disabled={orderLoading}
-            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg w-1/2 font-semibold text-white hover:scale-105 transition cursor-pointer transform"
-          >
-            {orderLoading ? "Создание..." : "Создать заказ"}
-          </button>
-          <button
-            onClick={() => setShowCheckout(false)}
-            className="bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg w-1/2 text-white hover:scale-105 transition cursor-pointer transform"
-          >
-            Отмена
-          </button>
+      {/* Модальное окно оформления заказа */}
+      {showCheckout && (
+        <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/25 animate-fadeIn">
+          <div className="bg-white shadow-2xl p-6 rounded-3xl w-full max-w-md animate-scaleUp">
+            <h3 className="mb-6 font-extrabold text-blue-900 text-2xl text-center">Форма заказа</h3>
+            <div className="flex flex-col gap-4">
+              <input
+                type="text"
+                placeholder="Имя"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="p-3 border rounded-2xl focus:outline-blue-500 w-full"
+              />
+              <input
+                type="text"
+                placeholder="Телефон"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="p-3 border rounded-2xl focus:outline-blue-500 w-full"
+              />
+              <input
+                type="text"
+                placeholder="Адрес"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="p-3 border rounded-2xl focus:outline-blue-500 w-full"
+              />
+              <div className="flex sm:flex-row flex-col gap-3 mt-4">
+                <button
+                  onClick={handleCheckout}
+                  disabled={orderLoading}
+                  className="bg-gradient-to-r from-green-500 hover:from-green-600 to-green-600 hover:to-green-700 px-6 py-3 rounded-2xl w-full sm:w-1/2 font-bold text-white hover:scale-105 transition-transform transform"
+                >
+                  {orderLoading ? "Создание..." : "Создать заказ"}
+                </button>
+                <button
+                  onClick={() => setShowCheckout(false)}
+                  className="bg-gray-400 hover:bg-gray-500 px-6 py-3 rounded-2xl w-full sm:w-1/2 font-bold text-white hover:scale-105 transition-transform transform"
+                >
+                  Отмена
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
-
+      )}
 
       {orderCompleted && (
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           <button
             onClick={() => navigate("/orderHistory")}
-            className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold text-white hover:scale-105 transition cursor-pointer transform"
+            className="bg-gradient-to-r from-purple-600 hover:from-purple-700 to-purple-700 hover:to-purple-800 px-6 py-3 rounded-2xl font-bold text-white hover:scale-105 transition-transform transform"
           >
             Посмотреть историю заказов
           </button>

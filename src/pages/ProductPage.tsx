@@ -13,7 +13,7 @@ export default function ProductPage() {
   const token = useSelector((state: RootState) => state.auth.token);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/products/${id}`)
+    axios.get(`https://backend-online-shop-vrxj.onrender.com/products/${id}`)
       .then(res => setProduct(res.data))
       .catch(err => console.error(err));
   }, [id]);
@@ -52,25 +52,34 @@ export default function ProductPage() {
   );
 
   return (
-    <div className="bg-white shadow-md hover:shadow-lg mx-auto mt-8 rounded-lg max-w-sm overflow-hidden transition-shadow">
-      {/* Фото товара */}
-      <img
-        src={product.image || "https://via.placeholder.com/300"}
-        alt={product.name}
-        className="w-full h-90px object-cover"
-      />
+    <div className="flex justify-center bg-gradient-to-b from-gray-100 to-gray-200 p-6 min-h-screen">
+      <div className="bg-white shadow-2xl mx-auto rounded-3xl max-w-md sm:max-w-lg md:max-w-xl overflow-hidden hover:scale-105 transition-transform duration-300">
+        
+        {/* Фото товара */}
+        <div className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden">
+          <img
+            src={product.image || "https://via.placeholder.com/400"}
+            alt={product.name}
+            className="rounded-t-3xl w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+          />
+          <div className="top-3 left-3 absolute bg-gradient-to-r from-green-500 to-green-300 shadow-md px-4 py-1 rounded-full font-bold text-white text-sm sm:text-base">
+            {product.category}
+          </div>
+        </div>
 
-      {/* Информация о товаре */}
-      <div className="flex flex-col gap-2 p-4">
-        <h2 className="font-bold text-blue-800 text-lg">{product.name}</h2>
-        <p className="text-gray-700 text-sm">{product.description}</p>
-        <p className="font-bold text-green-600 text-md">{product.price} $</p>
-        <button
-          onClick={handleAdd}
-          className="bg-blue-600 hover:bg-blue-800 mt-2 py-2 rounded-md font-semibold text-white text-sm hover:scale-105 transition-transform transform"
-        >
-          🛒 В корзину
-        </button>
+        {/* Информация о товаре */}
+        <div className="flex flex-col justify-between p-6 sm:p-8">
+          <h2 className="font-extrabold text-blue-900 text-xl sm:text-2xl md:text-3xl truncate">{product.name}</h2>
+          <p className="mt-2 text-gray-700 text-sm sm:text-base md:text-lg line-clamp-4">{product.description}</p>
+          <p className="mt-4 font-extrabold text-green-600 text-2xl sm:text-3xl md:text-4xl">{product.price} ₽</p>
+
+          <button
+            onClick={handleAdd}
+            className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg hover:shadow-2xl mt-6 px-6 py-3 sm:py-4 rounded-2xl font-bold text-white text-base sm:text-lg md:text-xl hover:scale-105 transition-transform duration-300 cursor-pointer hover:cursor-pointer"
+          >
+            🛒 Добавить в корзину
+          </button>
+        </div>
       </div>
     </div>
   );

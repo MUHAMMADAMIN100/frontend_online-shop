@@ -13,7 +13,7 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      const res = await fetch("http://localhost:3001/auth/register", {
+      const res = await fetch("https://backend-online-shop-vrxj.onrender.com/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -48,12 +48,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex justify-center items-center bg-gray-50 p-4 min-h-screen">
+    <div className="flex justify-center items-center bg-gradient-to-b from-gray-100 to-gray-200 p-4 min-h-screen">
       <form
-        className="bg-white shadow-lg hover:shadow-2xl p-6 md:p-8 rounded-xl w-full max-w-sm transition-shadow"
+        className="bg-white shadow-xl hover:shadow-2xl p-6 md:p-8 rounded-3xl w-full max-w-sm hover:scale-[1.01] transition-shadow transform"
         onSubmit={handleRegister}
       >
-        <h2 className="mb-4 md:mb-6 font-bold text-gray-800 text-2xl md:text-3xl text-center">
+        <h2 className="drop-shadow-lg mb-6 font-extrabold text-blue-900 text-3xl text-center">
           Регистрация
         </h2>
 
@@ -62,7 +62,7 @@ export default function RegisterPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mb-3 md:mb-4 p-2 md:p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full transition"
+          className="mb-4 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-full transition"
           required
           disabled={loading}
         />
@@ -72,20 +72,20 @@ export default function RegisterPage() {
           placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mb-4 md:mb-6 p-2 md:p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full transition"
+          className="mb-6 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-full transition"
           required
           disabled={loading}
         />
 
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-green-600 disabled:bg-green-300 p-2 md:p-3 rounded-lg w-full font-semibold text-white hover:scale-105 transition cursor-pointer transform"
+          className="bg-gradient-to-r from-blue-600 hover:from-blue-700 to-blue-800 hover:to-blue-900 py-3 rounded-2xl w-full font-bold text-white hover:scale-105 transition-transform transform"
           disabled={loading}
         >
           {loading ? "Регистрация..." : "Зарегистрироваться"}
         </button>
 
-        <p className="mt-3 md:mt-4 text-gray-600 text-sm md:text-base text-center">
+        <p className="mt-4 text-gray-600 text-sm md:text-base text-center">
           Уже есть аккаунт?{" "}
           <button
             type="button"

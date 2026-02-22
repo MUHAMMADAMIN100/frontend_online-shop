@@ -3,7 +3,7 @@ import axios from "axios"
 import type { RootState } from "../../app/store"
 import jwt_decode from "jwt-decode"
 
-const API_URL = "http://localhost:3001/cart"
+const API_URL = "https://backend-online-shop-vrxj.onrender.com/cart"
 
 const getUserIdFromToken = (token: string | null): number | null => {
   if (!token) return null

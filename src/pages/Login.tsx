@@ -2,6 +2,7 @@ import type React from "react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
+import Swal from "sweetalert2"
 import { setCredentials } from "../features/auth/authSlice"
 import type { AppDispatch } from "../app/store"
 
@@ -17,7 +18,7 @@ const LoginPage: React.FC = () => {
     setLoading(true)
 
     try {
-      const res = await fetch("http://localhost:3001/auth/login", {
+      const res = await fetch("https://backend-online-shop-vrxj.onrender.com/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -28,37 +29,60 @@ const LoginPage: React.FC = () => {
         dispatch(
           setCredentials({
             token: data.access_token,
-            role: data.user.role, 
+            role: data.user.role,
           })
         )
 
-        // Перенаправляем по роли
+        Swal.fire({
+          icon: 'success',
+          title: 'Вход выполнен!',
+          text: 'Добро пожаловать!',
+          timer: 1500,
+          showConfirmButton: false,
+          backdrop: true,
+        })
+
+        // Перенаправление по роли
         if (data.user.role === "ADMIN") {
           navigate("/admin")
         } else {
           navigate("/")
         }
       } else {
-        alert(data.message || "Ошибка при логине")
+        Swal.fire({
+          icon: 'error',
+          title: 'Ошибка при логине',
+          text: data.message || 'Проверьте email и пароль',
+        })
       }
     } catch (error) {
       console.error(error)
-      alert("Ошибка при подключении к серверу")
+      Swal.fire({
+        icon: 'error',
+        title: 'Ошибка подключения',
+        text: 'Не удалось подключиться к серверу',
+      })
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex justify-center items-center bg-gray-50 h-screen">
-      <form className="bg-white shadow-lg p-8 rounded-lg w-96" onSubmit={handleSubmit}>
-        <h2 className="mb-6 font-bold text-gray-800 text-3xl text-center">Вход</h2>
+    <div className="flex justify-center items-center bg-gradient-to-b from-gray-100 to-gray-200 p-6 min-h-screen">
+      <form
+        className="bg-white shadow-2xl p-8 rounded-3xl w-full max-w-md animate-scaleUp"
+        onSubmit={handleSubmit}
+      >
+        <h2 className="drop-shadow-lg mb-8 font-extrabold text-blue-900 text-3xl text-center">
+          🔑 Вход в аккаунт
+        </h2>
+
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+          className="mb-4 p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 w-full transition"
           required
           disabled={loading}
         />
@@ -67,13 +91,13 @@ const LoginPage: React.FC = () => {
           placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mb-6 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+          className="mb-6 p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 w-full transition"
           required
           disabled={loading}
         />
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 p-3 rounded-lg w-full font-semibold text-white transition-colors cursor-pointer"
+          className="bg-gradient-to-r from-blue-600 hover:from-blue-700 to-blue-800 hover:to-blue-900 disabled:opacity-50 shadow-lg hover:shadow-2xl py-3 rounded-2xl w-full font-bold text-white hover:scale-105 transition-transform transform"
           disabled={loading}
         >
           {loading ? "Вход..." : "Войти"}

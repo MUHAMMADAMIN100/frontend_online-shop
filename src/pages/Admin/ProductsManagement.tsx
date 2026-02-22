@@ -2,6 +2,7 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
+import { FiEdit, FiTrash2, FiPlus, FiCheck, FiX } from "react-icons/fi"; // иконки
 
 interface Product {
   id: number;
@@ -17,21 +18,18 @@ const ProductsManagement: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.auth);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [showForm, setShowForm] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
-  // Форма
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [category, setCategory] = useState("");
 
-  // Модалки
   const [modalMessage, setModalMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
-
-  // Подтверждение удаления
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -40,47 +38,26 @@ const ProductsManagement: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("http://localhost:3001/admin/products", {
+      const res = await fetch("https://backend-online-shop-vrxj.onrender.com/admin/products", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (response.ok) {
-        const data = await response.json();
+      if (res.ok) {
+        const data = await res.json();
         setProducts(data);
       }
-    } catch (error) {
+    } catch (err) {
+      console.error(err);
       showDialog("Ошибка при загрузке товаров");
-      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const showDialog = (message: string) => {
-    setModalMessage(message);
+  const showDialog = (msg: string) => {
+    setModalMessage(msg);
     setShowModal(true);
   };
 
-  const deleteProduct = async (productId: number) => {
-    try {
-      const response = await fetch(`http://localhost:3001/admin/products/${productId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        setProducts(products.filter((p) => p.id !== productId));
-        showDialog("Товар удален");
-      } else {
-        showDialog("Ошибка при удалении товара");
-      }
-    } catch (error) {
-      console.error(error);
-      showDialog("Ошибка при удалении товара");
-    } finally {
-      setConfirmDeleteId(null);
-    }
-  };
-
-  // Сброс формы
   const resetForm = () => {
     setEditingProductId(null);
     setName("");
@@ -88,6 +65,16 @@ const ProductsManagement: React.FC = () => {
     setDescription("");
     setImageUrl("");
     setCategory("");
+  };
+
+  const startEditing = (product: Product) => {
+    setEditingProductId(product.id);
+    setName(product.name);
+    setPrice(String(product.price));
+    setDescription(product.description);
+    setImageUrl(product.image || "");
+    setCategory(product.category);
+    setShowForm(true);
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -102,15 +89,13 @@ const ProductsManagement: React.FC = () => {
     try {
       let response: Response;
       if (editingProductId) {
-        // Редактирование
-        response = await fetch(`http://localhost:3001/admin/products/${editingProductId}`, {
+        response = await fetch(`https://backend-online-shop-vrxj.onrender.com/admin/products/${editingProductId}`, {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
       } else {
-        // Создание
-        response = await fetch("http://localhost:3001/admin/products", {
+        response = await fetch("https://backend-online-shop-vrxj.onrender.com/admin/products", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
           body: JSON.stringify(body),
@@ -132,42 +117,47 @@ const ProductsManagement: React.FC = () => {
         console.error(err);
         showDialog("Ошибка при сохранении товара");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       showDialog("Ошибка при сохранении товара");
     }
   };
 
-  const startEditing = (product: Product) => {
-    setEditingProductId(product.id);
-    setName(product.name);
-    setPrice(String(product.price));
-    setDescription(product.description);
-    setImageUrl(product.image || "");
-    setCategory(product.category);
-    setShowForm(true);
+  const deleteProduct = async (id: number) => {
+    try {
+      const res = await fetch(`https://backend-online-shop-vrxj.onrender.com/admin/products/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setProducts(products.filter((p) => p.id !== id));
+        showDialog("Товар удален");
+      } else {
+        showDialog("Ошибка при удалении товара");
+      }
+    } catch (err) {
+      console.error(err);
+      showDialog("Ошибка при удалении товара");
+    } finally {
+      setConfirmDeleteId(null);
+    }
   };
 
   if (loading) return <div className="py-8 text-center">Загрузка товаров...</div>;
 
   return (
-    <div className="relative bg-white shadow p-6 rounded-lg">
+    <div className="relative bg-white shadow p-6 rounded-xl">
       <h2 className="mb-4 font-semibold text-gray-900 text-xl">Управление товарами</h2>
 
-      {/* Кнопка добавить */}
       {!showForm && (
         <button
-          onClick={() => {
-            resetForm();
-            setShowForm(true);
-          }}
-          className="bg-blue-600 hover:bg-blue-700 mb-4 px-4 py-2 rounded text-white cursor-pointer"
+          onClick={() => { resetForm(); setShowForm(true); }}
+          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 mb-4 px-4 py-2 rounded-lg text-white"
         >
-          Добавить товар
+          <FiPlus /> Добавить
         </button>
       )}
 
-      {/* Форма */}
       {showForm && (
         <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/30">
           <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-lg scale-95 animate-scaleUp">
@@ -175,60 +165,22 @@ const ProductsManagement: React.FC = () => {
               {editingProductId ? "Редактирование товара" : "Добавление товара"}
             </h3>
             <form onSubmit={handleFormSubmit} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Название"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="p-2 border rounded w-full"
-              />
-              <input
-                type="number"
-                placeholder="Цена"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="p-2 border rounded w-full"
-              />
-              <textarea
-                placeholder="Описание"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="p-2 border rounded w-full"
-              />
-              <input
-                type="text"
-                placeholder="URL картинки"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                className="p-2 border rounded w-full"
-              />
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="p-2 border rounded w-full"
-              >
+              <input type="text" placeholder="Название" value={name} onChange={(e) => setName(e.target.value)} className="p-2 border rounded w-full" />
+              <input type="number" placeholder="Цена" value={price} onChange={(e) => setPrice(e.target.value)} className="p-2 border rounded w-full" />
+              <textarea placeholder="Описание" value={description} onChange={(e) => setDescription(e.target.value)} className="p-2 border rounded w-full" />
+              <input type="text" placeholder="URL картинки" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="p-2 border rounded w-full" />
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 border rounded w-full">
                 <option value="">Выберите категорию</option>
                 <option value="Футболки">Футболки</option>
                 <option value="Кроссовки">Кроссовки</option>
                 <option value="Шорты">Шорты</option>
               </select>
-
-              <div className="flex justify-between gap-2 mt-3">
-                <button
-                  type="submit"
-                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold text-white cursor-pointer"
-                >
-                  {editingProductId ? "Сохранить" : "Добавить"}
+              <div className="flex justify-between gap-2">
+                <button type="submit" className="flex items-center gap-1 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-white">
+                  <FiCheck /> {editingProductId ? "Сохранить" : "Добавить"}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    resetForm();
-                  }}
-                  className="bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white cursor-pointer"
-                >
-                  Отмена
+                <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="flex items-center gap-1 bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white">
+                  <FiX /> Отмена
                 </button>
               </div>
             </form>
@@ -241,40 +193,29 @@ const ProductsManagement: React.FC = () => {
         <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/20">
           <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-sm text-center scale-95 animate-scaleUp">
             <p className="text-gray-800">{modalMessage}</p>
-            <button
-              onClick={() => setShowModal(false)}
-              className="bg-blue-600 hover:bg-blue-700 mt-4 px-4 py-2 rounded-lg text-white cursor-pointer"
-            >
-              Ок
+            <button onClick={() => setShowModal(false)} className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 mt-4 px-4 py-2 rounded-lg text-white">
+              <FiCheck /> Ок
             </button>
           </div>
         </div>
       )}
 
-      {/* Подтверждение удаления */}
       {confirmDeleteId !== null && (
         <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/20">
           <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-sm text-center scale-95 animate-scaleUp">
             <p className="mb-4 text-gray-800">Вы уверены, что хотите удалить этот товар?</p>
             <div className="flex justify-center gap-4">
-              <button
-                onClick={() => deleteProduct(confirmDeleteId!)}
-                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white cursor-pointer"
-              >
-                Да
+              <button onClick={() => deleteProduct(confirmDeleteId)} className="flex items-center gap-1 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white">
+                <FiTrash2 /> Да
               </button>
-              <button
-                onClick={() => setConfirmDeleteId(null)}
-                className="bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white cursor-pointer"
-              >
-                Нет
+              <button onClick={() => setConfirmDeleteId(null)} className="flex items-center gap-1 bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white">
+                <FiX /> Нет
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Таблица товаров */}
       <div className="overflow-x-auto">
         <table className="divide-y divide-gray-200 min-w-full">
           <thead className="bg-gray-50">
@@ -297,14 +238,14 @@ const ProductsManagement: React.FC = () => {
                 <td className="px-6 py-4 max-w-xs truncate">{product.description}</td>
                 <td className="px-6 py-4">{product.category}</td>
                 <td className="px-6 py-4">
-                  {product.image ? <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" /> : "—"}
+                  {product.image ? <img src={product.image} alt={product.name} className="rounded w-16 h-16 object-cover" /> : "—"}
                 </td>
                 <td className="flex gap-2 px-6 py-4">
-                  <button onClick={() => startEditing(product)} className="text-blue-600 hover:text-blue-900 cursor-pointer">
-                    Редактировать
+                  <button onClick={() => startEditing(product)} className="flex items-center gap-1 text-blue-600 hover:text-blue-900 cursor-pointer">
+                    <FiEdit />
                   </button>
-                  <button onClick={() => setConfirmDeleteId(product.id)} className="text-red-600 hover:text-red-900 cursor-pointer">
-                    Удалить
+                  <button onClick={() => setConfirmDeleteId(product.id)} className="flex items-center gap-1 text-red-600 hover:text-red-900 cursor-pointer">
+                    <FiTrash2 />
                   </button>
                 </td>
               </tr>

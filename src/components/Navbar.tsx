@@ -9,24 +9,41 @@ export default function Navbar() {
   const totalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <nav className="flex justify-between items-center bg-white shadow-md p-4">
-      <Link to="/" className="font-bold text-xl">Shop</Link>
+    <nav className="flex sm:flex-row flex-col justify-between items-center gap-4 sm:gap-0 bg-white shadow-2xl px-6 py-4">
+      {/* Логотип / Название */}
+      <Link 
+        to="/" 
+        className="font-extrabold text-blue-900 hover:text-blue-800 text-2xl sm:text-3xl transition-colors"
+      >
+        🏋️ Shop
+      </Link>
 
-      <div className="flex items-center gap-4">
+      {/* Навигация и кнопки */}
+      <div className="flex items-center gap-3 sm:gap-4">
         <button
           onClick={() => navigate("/cart")}
-          className="relative bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white cursor-pointer"
+          className="relative bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg hover:shadow-2xl px-4 sm:px-5 py-2 sm:py-3 rounded-2xl font-semibold text-white hover:scale-105 transition-transform duration-300 cursor-pointer"
         >
           🛒 Корзина
           {totalCount > 0 && (
-            <span className="-top-2 -right-2 absolute flex justify-center items-center bg-red-500 rounded-full w-5 h-5 text-xs">
+            <span className="-top-2 -right-2 absolute flex justify-center items-center bg-red-500 shadow-md rounded-full w-5 h-5 font-bold text-white text-xs">
               {totalCount}
             </span>
           )}
         </button>
 
-        <Link to="/login" className="px-4 py-2 border rounded-lg">Войти</Link>
-        <Link to="/register" className="px-4 py-2 border rounded-lg">Регистрация</Link>
+        <Link 
+          to="/login" 
+          className="hover:bg-blue-600 px-4 sm:px-5 py-2 sm:py-3 border-2 border-blue-600 rounded-2xl font-semibold text-blue-600 hover:text-white transition-all duration-300"
+        >
+          Войти
+        </Link>
+        <Link 
+          to="/register" 
+          className="hover:bg-green-600 px-4 sm:px-5 py-2 sm:py-3 border-2 border-green-600 rounded-2xl font-semibold text-green-600 hover:text-white transition-all duration-300"
+        >
+          Регистрация
+        </Link>
       </div>
     </nav>
   );

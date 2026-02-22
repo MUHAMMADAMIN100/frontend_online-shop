@@ -11,39 +11,50 @@ const Checkout: React.FC = () => {
     setLoading(true);
     setMessage("");
     try {
-      const response = await fetch("http://localhost:3001/orders", {
+      const response = await fetch("https://backend-online-shop-vrxj.onrender.com/orders", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
       if (response.ok) {
         const data = await response.json();
-        setMessage("Заказ успешно оформлен!");
+        setMessage("✅ Заказ успешно оформлен!");
         console.log("Order created:", data);
       } else {
         const errorData = await response.json();
-        setMessage(errorData.message || "Ошибка при оформлении заказа");
+        setMessage(errorData.message || "❌ Ошибка при оформлении заказа");
       }
     } catch (error) {
       console.error(error);
-      setMessage("Ошибка при оформлении заказа");
+      setMessage("❌ Ошибка при оформлении заказа");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white shadow mx-auto mt-6 p-6 rounded-lg max-w-xl">
-      <h2 className="mb-4 font-semibold text-2xl">Оформление заказа</h2>
-      {message && <p className="mb-4 text-green-600">{message}</p>}
-      <button
-        onClick={handleCheckout}
-        disabled={loading}
-        className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded text-white"
-      >
-        {loading ? "Оформляем..." : "Оформить заказ"}
-      </button>
+    <div className="flex justify-center items-center bg-gradient-to-b from-gray-100 to-gray-200 p-6 min-h-screen">
+      <div className="bg-white shadow-2xl p-8 rounded-3xl w-full max-w-md animate-scaleUp">
+        <h2 className="drop-shadow-lg mb-6 font-extrabold text-blue-900 text-3xl text-center">
+          🛒 Оформление заказа
+        </h2>
+
+        {message && (
+          <p className={`mb-6 text-center font-semibold ${message.includes("успешно") ? "text-green-600" : "text-red-500"}`}>
+            {message}
+          </p>
+        )}
+
+        <button
+          onClick={handleCheckout}
+          disabled={loading}
+          className="bg-gradient-to-r from-blue-600 hover:from-blue-700 to-blue-800 hover:to-blue-900 shadow-lg hover:shadow-2xl py-3 rounded-2xl w-full font-bold text-white hover:scale-105 transition-transform transform"
+        >
+          {loading ? "Оформляем..." : "Оформить заказ"}
+        </button>
+      </div>
     </div>
   );
 };

@@ -66,13 +66,13 @@ export default function App() {
       <Navbar />
       <main className="mx-auto p-4 container">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/product/:id" element={<ProductPage />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/orderHistory" element={<OrdersHistory/>}/>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/product/:id" element={<ProductPage />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/orderHistory" element={<OrdersHistory/>}/>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
           <Route
             path="/admin/*"
             element={

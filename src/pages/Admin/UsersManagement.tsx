@@ -21,7 +21,7 @@ const UsersManagement: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://localhost:3001/admin/users", {
+      const response = await fetch("https://backend-online-shop-vrxj.onrender.com/admin/users", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -48,7 +48,7 @@ const UsersManagement: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/auth/promote-to-admin/${userId}`, {
+      const response = await fetch(`https://backend-online-shop-vrxj.onrender.com/auth/promote-to-admin/${userId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -74,7 +74,7 @@ const UsersManagement: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/admin/users/${userId}`, {
+      const response = await fetch(`https://backend-online-shop-vrxj.onrender.com/admin/users/${userId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
