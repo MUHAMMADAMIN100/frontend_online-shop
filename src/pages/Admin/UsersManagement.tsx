@@ -21,7 +21,7 @@ const UsersManagement: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("${import.meta.env.VITE_API_URL}/admin/users", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

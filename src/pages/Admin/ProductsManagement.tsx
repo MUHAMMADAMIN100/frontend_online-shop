@@ -43,7 +43,7 @@ const ProductsManagement: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("${import.meta.env.VITE_API_URL}/admin/products", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/products`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -100,7 +100,7 @@ const ProductsManagement: React.FC = () => {
           body: JSON.stringify(body),
         });
       } else {
-        response = await fetch("${import.meta.env.VITE_API_URL}/admin/products", {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/admin/products`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
           body: JSON.stringify(body),

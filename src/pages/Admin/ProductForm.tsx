@@ -64,7 +64,7 @@ const ProductForm: React.FC = () => {
         setMessage("Товар обновлен!");
       } else {
         await axios.post(
-          "${import.meta.env.VITE_API_URL}/products",
+          `${import.meta.env.VITE_API_URL}/products`,
           product,
           { headers: { Authorization: `Bearer ${token}` } }
         );

@@ -23,7 +23,7 @@ const AdminDashboard: React.FC = () => {
       }
 
       try {
-        const res = await axios.get("${import.meta.env.VITE_API_URL}/auth/validate-admin", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/auth/validate-admin`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.status === 200) setLoading(false)

@@ -23,7 +23,7 @@ const OrdersManagement: React.FC = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch("${import.meta.env.VITE_API_URL}/admin/orders", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       })
 
