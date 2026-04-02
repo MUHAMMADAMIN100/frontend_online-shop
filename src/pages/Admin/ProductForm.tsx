@@ -34,7 +34,7 @@ const ProductForm: React.FC = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`https://backend-online-shop-vrxj.onrender.com/products/${id}`)
+        .get(`${import.meta.env.VITE_API_URL}/products/${id}`)
         .then((res) => setProduct(res.data))
         .catch((err) => console.error(err));
     }
@@ -57,14 +57,14 @@ const ProductForm: React.FC = () => {
 
       if (id) {
         await axios.put(
-          `https://backend-online-shop-vrxj.onrender.com/products/${id}`,
+          `${import.meta.env.VITE_API_URL}/products/${id}`,
           product,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMessage("Товар обновлен!");
       } else {
         await axios.post(
-          "https://backend-online-shop-vrxj.onrender.com/products",
+          "${import.meta.env.VITE_API_URL}/products",
           product,
           { headers: { Authorization: `Bearer ${token}` } }
         );

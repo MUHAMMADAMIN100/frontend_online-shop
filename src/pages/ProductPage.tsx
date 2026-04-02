@@ -13,7 +13,7 @@ export default function ProductPage() {
   const token = useSelector((state: RootState) => state.auth.token);
 
   useEffect(() => {
-    axios.get(`https://backend-online-shop-vrxj.onrender.com/products/${id}`)
+    axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`)
       .then(res => setProduct(res.data))
       .catch(err => console.error(err));
   }, [id]);

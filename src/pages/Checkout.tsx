@@ -11,7 +11,7 @@ const Checkout: React.FC = () => {
     setLoading(true);
     setMessage("");
     try {
-      const response = await fetch("https://backend-online-shop-vrxj.onrender.com/orders", {
+      const response = await fetch("${import.meta.env.VITE_API_URL}/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

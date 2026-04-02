@@ -43,7 +43,7 @@ const ProductsManagement: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("https://backend-online-shop-vrxj.onrender.com/admin/products", {
+      const res = await fetch("${import.meta.env.VITE_API_URL}/admin/products", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -94,13 +94,13 @@ const ProductsManagement: React.FC = () => {
     try {
       let response: Response;
       if (editingProductId) {
-        response = await fetch(`https://backend-online-shop-vrxj.onrender.com/admin/products/${editingProductId}`, {
+        response = await fetch(`${import.meta.env.VITE_API_URL}/admin/products/${editingProductId}`, {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
       } else {
-        response = await fetch("https://backend-online-shop-vrxj.onrender.com/admin/products", {
+        response = await fetch("${import.meta.env.VITE_API_URL}/admin/products", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
           body: JSON.stringify(body),
@@ -130,7 +130,7 @@ const ProductsManagement: React.FC = () => {
 
   const deleteProduct = async (id: number) => {
     try {
-      const res = await fetch(`https://backend-online-shop-vrxj.onrender.com/admin/products/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/products/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

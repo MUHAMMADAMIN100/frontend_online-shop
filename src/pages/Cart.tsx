@@ -67,7 +67,7 @@ const Cart: React.FC = () => {
     }
     setOrderLoading(true);
     try {
-      const response = await fetch("https://backend-online-shop-vrxj.onrender.com/orders", {
+      const response = await fetch("${import.meta.env.VITE_API_URL}/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({

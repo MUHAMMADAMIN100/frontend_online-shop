@@ -19,7 +19,7 @@ export default function Home() {
 
   useEffect(() => {
     axios
-      .get("https://backend-online-shop-vrxj.onrender.com/products")
+      .get("${import.meta.env.VITE_API_URL}/products")
       .then((res) => {
         setProducts(res.data);
         setFiltered(res.data);
