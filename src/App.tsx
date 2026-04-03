@@ -58,9 +58,9 @@ export default function App() {
   }, [cartError]);
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh' }}>
       <Navbar />
-      <main className="mx-auto p-4 container">
+      <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/product/:id" element={<ProductPage />} />

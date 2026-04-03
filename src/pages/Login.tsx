@@ -1,6 +1,6 @@
 import type React from "react"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import Swal from "sweetalert2"
 import { setCredentials } from "../features/auth/authSlice"
@@ -16,7 +16,6 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: "POST",
@@ -24,85 +23,102 @@ const LoginPage: React.FC = () => {
         body: JSON.stringify({ email, password }),
       })
       const data = await res.json()
-
       if (res.ok) {
-        dispatch(
-          setCredentials({
-            token: data.access_token,
-            role: data.user.role,
-          })
-        )
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Вход выполнен!',
-          text: 'Добро пожаловать!',
-          timer: 1500,
-          showConfirmButton: false,
-          backdrop: true,
-        })
-
-        // Перенаправление по роли
-        if (data.user.role === "ADMIN") {
-          navigate("/admin")
-        } else {
-          navigate("/")
-        }
+        dispatch(setCredentials({ token: data.access_token, role: data.user.role }))
+        Swal.fire({ icon: 'success', title: 'Benvenuto!', text: 'Добро пожаловать!', timer: 1500, showConfirmButton: false, confirmButtonColor: '#FF0000' })
+        if (data.user.role === "ADMIN") navigate("/admin")
+        else navigate("/")
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Ошибка при логине',
-          text: data.message || 'Проверьте email и пароль',
-        })
+        Swal.fire({ icon: 'error', title: 'Errore', text: data.message || 'Проверьте email и пароль', confirmButtonColor: '#FF0000' })
       }
-    } catch (error) {
-      console.error(error)
-      Swal.fire({
-        icon: 'error',
-        title: 'Ошибка подключения',
-        text: 'Не удалось подключиться к серверу',
-      })
+    } catch {
+      Swal.fire({ icon: 'error', title: 'Errore di connessione', text: 'Не удалось подключиться к серверу', confirmButtonColor: '#FF0000' })
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex justify-center items-center bg-gradient-to-b from-gray-100 to-gray-200 p-6 min-h-screen">
-      <form
-        className="bg-white shadow-2xl p-8 rounded-3xl w-full max-w-md animate-scaleUp"
-        onSubmit={handleSubmit}
-      >
-        <h2 className="drop-shadow-lg mb-8 font-extrabold text-blue-900 text-3xl text-center">
-          🔑 Вход в аккаунт
-        </h2>
+    <div style={{
+      minHeight: '100vh', backgroundColor: '#F7F4EF',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 24
+    }}>
+      <div className="animate-scaleUp" style={{ width: '100%', maxWidth: 440 }}>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="mb-4 p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 w-full transition"
-          required
-          disabled={loading}
-        />
-        <input
-          type="password"
-          placeholder="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mb-6 p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400 w-full transition"
-          required
-          disabled={loading}
-        />
-        <button
-          type="submit"
-          className="bg-gradient-to-r from-blue-600 hover:from-blue-700 to-blue-800 hover:to-blue-900 disabled:opacity-50 shadow-lg hover:shadow-2xl py-3 rounded-2xl w-full font-bold text-white hover:scale-105 transition-transform transform"
-          disabled={loading}
-        >
-          {loading ? "Вход..." : "Войти"}
-        </button>
-      </form>
+        {/* Лого */}
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <div style={{
+            width: 64, height: 64,
+            border: '1.5px solid #8B0000', borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px',
+            fontFamily: "'Playfair Display', serif",
+            color: '#8B0000', fontSize: 20, fontWeight: 600
+          }}>OS</div>
+          <h1 className="serif" style={{ fontSize: 28, color: '#8B0000', letterSpacing: 6, fontWeight: 500, marginBottom: 4 }}>
+            OLIMPIA
+          </h1>
+          <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#999', fontFamily: 'Montserrat' }}>
+            Sport Atelier · Вход
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 16 }}>
+            <div style={{ width: 30, height: 1, backgroundColor: '#008000' }} />
+            <div style={{ width: 5, height: 5, backgroundColor: '#FF0000', borderRadius: '50%' }} />
+            <div style={{ width: 30, height: 1, backgroundColor: '#FF0000' }} />
+          </div>
+        </div>
+
+        {/* Форма */}
+        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '40px 48px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div>
+              <label style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#555', fontFamily: 'Montserrat', display: 'block', marginBottom: 8 }}>
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                disabled={loading}
+                placeholder="your@email.com"
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#555', fontFamily: 'Montserrat', display: 'block', marginBottom: 8 }}>
+                Пароль
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                placeholder="••••••••"
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={loading}
+              style={{ width: '100%', textAlign: 'center', marginTop: 8, opacity: loading ? 0.7 : 1 }}
+            >
+              {loading ? "Вход..." : "Войти"}
+            </button>
+          </form>
+
+          <p style={{ textAlign: 'center', marginTop: 24, fontSize: 11, color: '#888', fontFamily: 'Montserrat' }}>
+            Нет аккаунта?{' '}
+            <Link to="/register" style={{ color: '#FF0000', textDecoration: 'none', fontWeight: 600, letterSpacing: 1 }}>
+              Регистрация
+            </Link>
+          </p>
+        </div>
+
+        {/* Триколор снизу */}
+        <div className="tricolor" style={{ marginTop: 0 }} />
+      </div>
     </div>
   )
 }

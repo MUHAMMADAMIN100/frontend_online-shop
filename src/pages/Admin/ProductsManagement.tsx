@@ -1,257 +1,145 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import { FiEdit, FiTrash2, FiPlus, FiCheck, FiX } from "react-icons/fi";
-import type { IconType } from "react-icons";
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  image?: string;
-  createdAt: string;
-  category: string;
-}
-
-// Icon wrapper для TS
-const Icon: React.FC<{ icon: IconType; size?: number }> = ({ icon: IconComponent, size }) => {
-  return <IconComponent size={size} />;
-};
+interface Product { id: number; name: string; price: number; description: string; image?: string; category: string; }
 
 const ProductsManagement: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.auth);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [showForm, setShowForm] = useState(false);
-  const [editingProductId, setEditingProductId] = useState<number | null>(null);
-
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [category, setCategory] = useState("");
+  const [message, setMessage] = useState("");
 
-  const [modalMessage, setModalMessage] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useEffect(() => { fetchProducts(); }, []);
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/products`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setProducts(data);
-      }
-    } catch (err) {
-      console.error(err);
-      showDialog("Ошибка при загрузке товаров");
-    } finally {
-      setLoading(false);
-    }
+      const r = await fetch(`${import.meta.env.VITE_API_URL}/admin/products`, { headers: { Authorization: `Bearer ${token}` } });
+      if (r.ok) setProducts(await r.json());
+    } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
-  const showDialog = (msg: string) => {
-    setModalMessage(msg);
-    setShowModal(true);
-  };
+  const resetForm = () => { setEditingId(null); setName(""); setPrice(""); setDescription(""); setImageUrl(""); setCategory(""); };
+  const startEditing = (p: Product) => { setEditingId(p.id); setName(p.name); setPrice(String(p.price)); setDescription(p.description); setImageUrl(p.image || ""); setCategory(p.category); setShowForm(true); };
 
-  const resetForm = () => {
-    setEditingProductId(null);
-    setName("");
-    setPrice("");
-    setDescription("");
-    setImageUrl("");
-    setCategory("");
-  };
-
-  const startEditing = (product: Product) => {
-    setEditingProductId(product.id);
-    setName(product.name);
-    setPrice(String(product.price));
-    setDescription(product.description);
-    setImageUrl(product.image || "");
-    setCategory(product.category);
-    setShowForm(true);
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !price || !category) {
-      showDialog("Введите название, цену и категорию");
-      return;
-    }
-
     const body = { name, price: Number(price), description, image: imageUrl, category };
-
     try {
-      let response: Response;
-      if (editingProductId) {
-        response = await fetch(`${import.meta.env.VITE_API_URL}/admin/products/${editingProductId}`, {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
+      let r: Response;
+      if (editingId) {
+        r = await fetch(`${import.meta.env.VITE_API_URL}/admin/products/${editingId}`, { method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(body) });
       } else {
-        response = await fetch(`${import.meta.env.VITE_API_URL}/admin/products`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
+        r = await fetch(`${import.meta.env.VITE_API_URL}/admin/products`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(body) });
       }
-
-      if (response.ok) {
-        const updatedProduct = await response.json();
-        if (editingProductId) {
-          setProducts(products.map((p) => (p.id === editingProductId ? updatedProduct : p)));
-        } else {
-          setProducts([...products, updatedProduct]);
-        }
-        resetForm();
-        setShowForm(false);
-        showDialog(editingProductId ? "Товар обновлен" : "Товар добавлен");
-      } else {
-        const err = await response.text();
-        console.error(err);
-        showDialog("Ошибка при сохранении товара");
+      if (r.ok) {
+        const updated = await r.json();
+        if (editingId) setProducts(products.map(p => p.id === editingId ? updated : p));
+        else setProducts([...products, updated]);
+        resetForm(); setShowForm(false);
+        setMessage(editingId ? "Товар обновлён" : "Товар добавлен");
+        setTimeout(() => setMessage(""), 3000);
       }
-    } catch (err) {
-      console.error(err);
-      showDialog("Ошибка при сохранении товара");
-    }
+    } catch (e) { console.error(e); }
   };
 
   const deleteProduct = async (id: number) => {
+    if (!confirm("Удалить товар?")) return;
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/products/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        setProducts(products.filter((p) => p.id !== id));
-        showDialog("Товар удален");
-      } else {
-        showDialog("Ошибка при удалении товара");
-      }
-    } catch (err) {
-      console.error(err);
-      showDialog("Ошибка при удалении товара");
-    } finally {
-      setConfirmDeleteId(null);
-    }
+      const r = await fetch(`${import.meta.env.VITE_API_URL}/admin/products/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      if (r.ok) setProducts(products.filter(p => p.id !== id));
+    } catch (e) { console.error(e); }
   };
 
-  if (loading) return <div className="py-8 text-center">Загрузка товаров...</div>;
+  if (loading) return <p className="serif" style={{ color: '#8B0000', textAlign: 'center', padding: 40, letterSpacing: 2 }}>Caricamento...</p>;
 
   return (
-    <div className="relative bg-white shadow p-6 rounded-xl">
-      <h2 className="mb-4 font-semibold text-gray-900 text-xl">Управление товарами</h2>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+        <div>
+          <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#008000', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 4 }}>Gestione Prodotti</p>
+          <h2 className="serif" style={{ fontSize: 24, color: '#8B0000', fontWeight: 500 }}>Товары</h2>
+          <div style={{ width: 40, height: 2, backgroundColor: '#FF0000', marginTop: 8 }} />
+        </div>
+        {!showForm && (
+          <button onClick={() => { resetForm(); setShowForm(true); }} className="btn-primary">
+            + Добавить товар
+          </button>
+        )}
+      </div>
 
-      {!showForm && (
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 mb-4 px-4 py-2 rounded-lg text-white"
-        >
-          <Icon icon={FiPlus} size={20} /> Добавить
-        </button>
+      {message && (
+        <div style={{ backgroundColor: '#008000', color: '#FFFFFF', padding: '12px 20px', marginBottom: 20, fontSize: 11, letterSpacing: 2, fontFamily: 'Montserrat' }}>
+          {message}
+        </div>
       )}
 
+      {/* Форма */}
       {showForm && (
-        <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/30">
-          <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-lg scale-95 animate-scaleUp">
-            <h3 className="mb-4 font-semibold text-blue-800 text-2xl text-center">
-              {editingProductId ? "Редактирование товара" : "Добавление товара"}
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div className="animate-scaleUp" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '40px', width: '100%', maxWidth: 500 }}>
+            <h3 className="serif" style={{ fontSize: 20, color: '#8B0000', letterSpacing: 2, marginBottom: 24, textAlign: 'center' }}>
+              {editingId ? "Редактировать" : "Добавить товар"}
             </h3>
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              <input type="text" placeholder="Название" value={name} onChange={(e) => setName(e.target.value)} className="p-2 border rounded w-full" />
-              <input type="number" placeholder="Цена" value={price} onChange={(e) => setPrice(e.target.value)} className="p-2 border rounded w-full" />
-              <textarea placeholder="Описание" value={description} onChange={(e) => setDescription(e.target.value)} className="p-2 border rounded w-full" />
-              <input type="text" placeholder="URL картинки" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="p-2 border rounded w-full" />
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 border rounded w-full">
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <input placeholder="Название" value={name} onChange={e => setName(e.target.value)} required />
+              <input type="number" placeholder="Цена" value={price} onChange={e => setPrice(e.target.value)} required />
+              <textarea placeholder="Описание" value={description} onChange={e => setDescription(e.target.value)} style={{ resize: 'vertical', minHeight: 80 }} />
+              <input placeholder="URL изображения" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
+              <select value={category} onChange={e => setCategory(e.target.value)}>
                 <option value="">Выберите категорию</option>
                 <option value="Футболки">Футболки</option>
                 <option value="Кроссовки">Кроссовки</option>
                 <option value="Шорты">Шорты</option>
               </select>
-
-              <div className="flex justify-between gap-2">
-                <button type="submit" className="flex items-center gap-1 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-white">
-                  <Icon icon={FiCheck} size={18} /> {editingProductId ? "Сохранить" : "Добавить"}
-                </button>
-                <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="flex items-center gap-1 bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white">
-                  <Icon icon={FiX} size={18} /> Отмена
-                </button>
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                <button type="submit" className="btn-green" style={{ flex: 1, textAlign: 'center' }}>Сохранить</button>
+                <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="btn-secondary" style={{ flex: 1, textAlign: 'center' }}>Отмена</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {showModal && (
-        <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/20">
-          <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-sm text-center scale-95 animate-scaleUp">
-            <p className="text-gray-800">{modalMessage}</p>
-            <button onClick={() => setShowModal(false)} className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 mt-4 px-4 py-2 rounded-lg text-white">
-              <Icon icon={FiCheck} size={18} /> Ок
-            </button>
-          </div>
-        </div>
-      )}
-
-      {confirmDeleteId !== null && (
-        <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/20">
-          <div className="bg-white shadow-xl p-6 rounded-xl w-full max-w-sm text-center scale-95 animate-scaleUp">
-            <p className="mb-4 text-gray-800">Вы уверены, что хотите удалить этот товар?</p>
-            <div className="flex justify-center gap-4">
-              <button onClick={() => deleteProduct(confirmDeleteId)} className="flex items-center gap-1 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white">
-                <Icon icon={FiTrash2} size={18} /> Да
-              </button>
-              <button onClick={() => setConfirmDeleteId(null)} className="flex items-center gap-1 bg-gray-400 hover:bg-gray-500 px-4 py-2 rounded-lg text-white">
-                <Icon icon={FiX} size={18} /> Нет
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="overflow-x-auto">
-        <table className="divide-y divide-gray-200 min-w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left">ID</th>
-              <th className="px-6 py-3 text-left">Название</th>
-              <th className="px-6 py-3 text-left">Цена</th>
-              <th className="px-6 py-3 text-left">Описание</th>
-              <th className="px-6 py-3 text-left">Категория</th>
-              <th className="px-6 py-3 text-left">Картинка</th>
-              <th className="px-6 py-3 text-left">Действия</th>
+      {/* Таблица */}
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Montserrat' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#F7F4EF', borderBottom: '2px solid #D9CFC0' }}>
+              {['Фото', 'Название', 'Цена', 'Категория', 'Действия'].map(h => (
+                <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontWeight: 600 }}>{h}</th>
+              ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td className="px-6 py-4">{product.id}</td>
-                <td className="px-6 py-4">{product.name}</td>
-                <td className="px-6 py-4">{product.price}₽</td>
-                <td className="px-6 py-4 max-w-xs truncate">{product.description}</td>
-                <td className="px-6 py-4">{product.category}</td>
-                <td className="px-6 py-4">
-                  {product.image ? <img src={product.image} alt={product.name} className="rounded w-16 h-16 object-cover" /> : "—"}
+          <tbody>
+            {products.map(p => (
+              <tr key={p.id} style={{ borderBottom: '1px solid #D9CFC0' }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.backgroundColor = '#F7F4EF'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'}
+              >
+                <td style={{ padding: '12px 16px' }}>
+                  {p.image ? <img src={p.image} alt={p.name} style={{ width: 52, height: 52, objectFit: 'cover' }} /> : <div style={{ width: 52, height: 52, backgroundColor: '#F7F4EF', border: '1px solid #D9CFC0' }} />}
                 </td>
-                <td className="flex gap-2 px-6 py-4">
-                  <button onClick={() => startEditing(product)} className="flex items-center gap-1 text-blue-600 hover:text-blue-900 cursor-pointer">
-                    <Icon icon={FiEdit} size={18} />
-                  </button>
-                  <button onClick={() => setConfirmDeleteId(product.id)} className="flex items-center gap-1 text-red-600 hover:text-red-900 cursor-pointer">
-                    <Icon icon={FiTrash2} size={18} />
-                  </button>
+                <td style={{ padding: '12px 16px' }}>
+                  <p className="serif" style={{ fontSize: 15, color: '#1A1A1A', fontWeight: 500, marginBottom: 2 }}>{p.name}</p>
+                  <p style={{ fontSize: 10, color: '#888', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.description}</p>
+                </td>
+                <td style={{ padding: '12px 16px' }}>
+                  <span className="serif" style={{ fontSize: 16, color: '#FF0000', fontWeight: 600 }}>{p.price.toLocaleString()} ₽</span>
+                </td>
+                <td style={{ padding: '12px 16px' }}>
+                  <span style={{ padding: '3px 10px', backgroundColor: '#008000', color: '#FFFFFF', fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 600 }}>{p.category}</span>
+                </td>
+                <td style={{ padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <button onClick={() => startEditing(p)} style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#008000', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Montserrat', fontWeight: 600 }}>Изменить</button>
+                  <button onClick={() => deleteProduct(p.id)} style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#FF0000', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Montserrat', fontWeight: 600 }}>Удалить</button>
                 </td>
               </tr>
             ))}

@@ -20,65 +20,70 @@ export default function ProductPage() {
 
   const handleAdd = async () => {
     if (!token) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Войдите в аккаунт',
-        text: 'Чтобы добавить товар в корзину, необходимо авторизоваться',
-      });
+      Swal.fire({ icon: 'warning', title: 'Войдите в аккаунт', text: 'Необходима авторизация', confirmButtonColor: '#FF0000' });
       return;
     }
     try {
       await dispatch(addToCart({ productId: product.id, quantity: 1 })).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: 'Товар добавлен!',
-        timer: 1200,
-        showConfirmButton: false,
-      });
-    } catch (err: any) {
-      console.error(err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Ошибка',
-        text: 'Не удалось добавить товар в корзину',
-      });
+      Swal.fire({ icon: 'success', title: 'Aggiunto al carrello!', timer: 1200, showConfirmButton: false });
+    } catch {
+      Swal.fire({ icon: 'error', title: 'Errore', text: 'Не удалось добавить товар', confirmButtonColor: '#FF0000' });
     }
   };
 
   if (!product) return (
-    <div className="flex justify-center items-center h-screen text-gray-500 text-base">
-      Загрузка...
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+      <p className="serif" style={{ color: '#8B0000', fontSize: 18, letterSpacing: 3 }}>Caricamento...</p>
     </div>
   );
 
   return (
-    <div className="flex justify-center bg-gradient-to-b from-gray-100 to-gray-200 p-6 min-h-screen">
-      <div className="bg-white shadow-2xl mx-auto rounded-3xl max-w-md sm:max-w-lg md:max-w-xl overflow-hidden hover:scale-105 transition-transform duration-300">
-        
-        {/* Фото товара */}
-        <div className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden">
+    <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh', padding: '60px 40px' }}>
+      <div style={{ maxWidth: 960, margin: '0 auto', backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', display: 'flex', flexWrap: 'wrap' }}>
+
+        {/* Фото */}
+        <div style={{ flex: '1 1 400px', overflow: 'hidden', maxHeight: 540 }}>
           <img
-            src={product.image || "https://via.placeholder.com/400"}
+            src={product.image || "https://via.placeholder.com/600x540?text=OLIMPIA"}
             alt={product.name}
-            className="rounded-t-3xl w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s' }}
+            onMouseEnter={e => (e.target as HTMLElement).style.transform = 'scale(1.04)'}
+            onMouseLeave={e => (e.target as HTMLElement).style.transform = 'scale(1)'}
           />
-          <div className="top-3 left-3 absolute bg-gradient-to-r from-green-500 to-green-300 shadow-md px-4 py-1 rounded-full font-bold text-white text-sm sm:text-base">
-            {product.category}
-          </div>
         </div>
 
-        {/* Информация о товаре */}
-        <div className="flex flex-col justify-between p-6 sm:p-8">
-          <h2 className="font-extrabold text-blue-900 text-xl sm:text-2xl md:text-3xl truncate">{product.name}</h2>
-          <p className="mt-2 text-gray-700 text-sm sm:text-base md:text-lg line-clamp-4">{product.description}</p>
-          <p className="mt-4 font-extrabold text-green-600 text-2xl sm:text-3xl md:text-4xl">{product.price} ₽</p>
+        {/* Детали */}
+        <div style={{ flex: '1 1 360px', padding: '48px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {product.category && (
+            <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#008000', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 16 }}>
+              {product.category}
+            </p>
+          )}
+          <h1 className="serif" style={{ fontSize: 32, color: '#1A1A1A', fontWeight: 500, marginBottom: 16, lineHeight: 1.3 }}>
+            {product.name}
+          </h1>
 
-          <button
-            onClick={handleAdd}
-            className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg hover:shadow-2xl mt-6 px-6 py-3 sm:py-4 rounded-2xl font-bold text-white text-base sm:text-lg md:text-xl hover:scale-105 transition-transform duration-300 cursor-pointer hover:cursor-pointer"
-          >
-            🛒 Добавить в корзину
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 24, height: 1, backgroundColor: '#008000' }} />
+            <div style={{ width: 4, height: 4, backgroundColor: '#FF0000', borderRadius: '50%' }} />
+            <div style={{ width: 24, height: 1, backgroundColor: '#FF0000' }} />
+          </div>
+
+          <p style={{ fontSize: 13, color: '#666', lineHeight: 1.8, fontFamily: 'Montserrat', marginBottom: 32 }}>
+            {product.description}
+          </p>
+
+          <p className="serif" style={{ fontSize: 36, color: '#FF0000', fontWeight: 600, marginBottom: 32 }}>
+            {product.price.toLocaleString()} ₽
+          </p>
+
+          <button onClick={handleAdd} className="btn-primary" style={{ width: '100%', textAlign: 'center', fontSize: 11 }}>
+            Добавить в корзину
           </button>
+
+          <p style={{ marginTop: 20, fontSize: 9, letterSpacing: 3, color: '#999', fontFamily: 'Montserrat', textAlign: 'center', textTransform: 'uppercase' }}>
+            Доставка · Гарантия качества · Возврат 30 дней
+          </p>
         </div>
       </div>
     </div>

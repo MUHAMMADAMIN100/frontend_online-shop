@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import {
-  fetchCart,
-  addToCart,
-  removeFromCart,
-  clearCart,
-} from "../features/cart/cartSlice";
+import { fetchCart, addToCart, removeFromCart, clearCart } from "../features/cart/cartSlice";
 import type { RootState } from "../app/store";
 
 const Cart: React.FC = () => {
@@ -23,46 +18,28 @@ const Cart: React.FC = () => {
   const [address, setAddress] = useState("");
   const [orderLoading, setOrderLoading] = useState(false);
 
-  useEffect(() => {
-    dispatch(fetchCart());
-  }, [dispatch]);
+  useEffect(() => { dispatch(fetchCart()); }, [dispatch]);
 
   const handleAdd = (productId: number) => dispatch(addToCart({ productId, quantity: 1 }));
   const handleRemove = (productId: number) => {
     const item = items.find((i) => i.productId === productId);
     if (!item) return;
-    item.quantity > 1
-      ? dispatch(addToCart({ productId, quantity: -1 }))
-      : dispatch(removeFromCart(item.id));
+    item.quantity > 1 ? dispatch(addToCart({ productId, quantity: -1 })) : dispatch(removeFromCart(item.id));
   };
   const handleDelete = (cartItemId: number) => dispatch(removeFromCart(cartItemId));
   const handleClear = () => {
     Swal.fire({
-      title: "Вы уверены?",
-      text: "Это очистит всю корзину!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      cancelButtonColor: "#9ca3af",
-      confirmButtonText: "Да, очистить",
-      cancelButtonText: "Отмена",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(clearCart());
-        Swal.fire("Очищено!", "Корзина была очищена.", "success");
-      }
-    });
+      title: "Очистить корзину?", icon: "warning",
+      showCancelButton: true, confirmButtonColor: "#FF0000", cancelButtonColor: "#888",
+      confirmButtonText: "Да", cancelButtonText: "Отмена"
+    }).then(r => { if (r.isConfirmed) { dispatch(clearCart()); } });
   };
 
   const totalPrice = items.reduce((sum, item) => sum + item.quantity * item.product.price, 0);
 
   const handleCheckout = async () => {
     if (!name || !phone || !address) {
-      Swal.fire({
-        icon: "warning",
-        title: "Заполните все поля",
-        text: "Пожалуйста, заполните форму заказа полностью.",
-      });
+      Swal.fire({ icon: "warning", title: "Заполните все поля", confirmButtonColor: '#FF0000' });
       return;
     }
     setOrderLoading(true);
@@ -70,164 +47,116 @@ const Cart: React.FC = () => {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          customerName: name,
-          phone,
-          address,
-          items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
-        }),
+        body: JSON.stringify({ customerName: name, phone, address, items: items.map(i => ({ productId: i.productId, quantity: i.quantity })) }),
       });
       if (response.ok) {
-        Swal.fire({ icon: "success", title: "Заказ успешно создан!", showConfirmButton: false, timer: 1500 });
-        dispatch(clearCart());
-        setShowCheckout(false);
-        setOrderCompleted(true);
+        Swal.fire({ icon: "success", title: "Ordine creato!", showConfirmButton: false, timer: 1500 });
+        dispatch(clearCart()); setShowCheckout(false); setOrderCompleted(true);
         setName(""); setPhone(""); setAddress("");
       } else {
-        const errorText = await response.text();
-        console.error(errorText);
-        Swal.fire("Ошибка", "Не удалось создать заказ", "error");
+        Swal.fire("Errore", "Не удалось создать заказ", "error");
       }
-    } catch (error) {
-      console.error(error);
-      Swal.fire("Ошибка", "Не удалось создать заказ", "error");
-    } finally {
-      setOrderLoading(false);
-    }
+    } catch {
+      Swal.fire("Errore", "Не удалось создать заказ", "error");
+    } finally { setOrderLoading(false); }
   };
 
-  if (loading)
-    return <p className="mt-10 text-gray-500 text-lg text-center">Loading...</p>;
+  if (loading) return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+      <p className="serif" style={{ color: '#8B0000', fontSize: 18, letterSpacing: 3 }}>Caricamento...</p>
+    </div>
+  );
 
   return (
-    <div className="relative mx-auto p-6 max-w-6xl">
-      <h2 className="drop-shadow-lg mb-8 font-extrabold text-blue-900 text-4xl text-center">🛒 Корзина</h2>
+    <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh', padding: '60px 40px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
-      {items.length === 0 && !orderCompleted ? (
-        <p className="text-gray-600 text-xl text-center">Корзина пуста</p>
-      ) : (
-        <>
-          {items.length > 0 && (
-            <ul className="space-y-6">
-              {items.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex md:flex-row flex-col justify-between items-center bg-white shadow-xl hover:shadow-2xl p-5 rounded-3xl hover:scale-105 transition-transform transform"
-                >
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={item.product.image || "https://via.placeholder.com/100"}
-                      alt={item.product.name}
-                      className="rounded-2xl w-24 h-24 object-cover hover:scale-110 transition-transform"
-                    />
-                    <div>
-                      <h3 className="font-bold text-blue-900 text-lg">{item.product.name}</h3>
-                      <p className="font-extrabold text-green-600">{item.product.price} ₽</p>
-                      <p className="text-gray-500">Кол-во: {item.quantity}</p>
-                    </div>
-                  </div>
+        {/* Заголовок */}
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <h1 className="serif" style={{ fontSize: 36, color: '#8B0000', letterSpacing: 4, fontWeight: 500, marginBottom: 8 }}>
+            Il Carrello
+          </h1>
+          <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat' }}>Ваша корзина</p>
+        </div>
 
-                  <div className="flex gap-2 mt-3 md:mt-0">
-                    <button
-                      onClick={() => handleAdd(item.productId)}
-                      className="bg-gradient-to-r from-green-500 hover:from-green-600 to-green-600 hover:to-green-700 px-5 py-2 rounded-2xl font-semibold text-white hover:scale-105 transition-transform cursor-pointer transform"
-                    >
-                      +
-                    </button>
-                    <button
-                      onClick={() => handleRemove(item.productId)}
-                      className="bg-gradient-to-r from-yellow-400 hover:from-yellow-500 to-yellow-500 hover:to-yellow-600 px-5 py-2 rounded-2xl font-semibold text-white hover:scale-105 transition-transform cursor-pointer transform"
-                    >
-                      -
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="bg-gradient-to-r from-red-500 hover:from-red-600 to-red-600 hover:to-red-700 px-5 py-2 rounded-2xl font-semibold text-white hover:scale-105 transition-transform cursor-pointer transform"
-                    >
-                      Удалить
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {/* Итого и действия */}
-          <div className="flex md:flex-row flex-col justify-between items-center gap-4 bg-gray-100 shadow-lg mt-8 p-5 rounded-2xl">
-            <p className="font-extrabold text-blue-900 text-xl">Итого: {totalPrice.toFixed(2)} ₽</p>
-            <div className="flex sm:flex-row flex-col gap-3 w-full sm:w-auto">
-              <button
-                onClick={() => setShowCheckout(true)}
-                className="bg-gradient-to-r from-blue-600 hover:from-blue-700 to-blue-800 hover:to-blue-900 px-6 py-3 rounded-2xl font-bold text-white hover:scale-105 transition-transform transform"
-              >
-                Оформить заказ
-              </button>
-              <button
-                onClick={handleClear}
-                className="bg-gradient-to-r from-red-500 hover:from-red-600 to-red-600 hover:to-red-700 px-6 py-3 rounded-2xl font-bold text-white hover:scale-105 transition-transform transform"
-              >
-                Очистить корзину
-              </button>
-            </div>
+        {items.length === 0 && !orderCompleted ? (
+          <div style={{ textAlign: 'center', padding: '80px 0', backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0' }}>
+            <p className="serif" style={{ fontSize: 22, color: '#8B0000', marginBottom: 8 }}>Корзина пуста</p>
+            <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat', letterSpacing: 2 }}>Il carrello è vuoto</p>
           </div>
-        </>
-      )}
+        ) : (
+          <>
+            {items.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {items.map((item) => (
+                  <div key={item.id} className="italian-card" style={{ display: 'flex', alignItems: 'center', gap: 24, padding: '20px 28px' }}>
+                    <img src={item.product.image || "https://via.placeholder.com/80"} alt={item.product.name}
+                      style={{ width: 80, height: 80, objectFit: 'cover' }} />
+                    <div style={{ flex: 1 }}>
+                      <h3 className="serif" style={{ fontSize: 16, color: '#1A1A1A', fontWeight: 500, marginBottom: 4 }}>{item.product.name}</h3>
+                      <p style={{ fontSize: 14, color: '#FF0000', fontFamily: 'Montserrat', fontWeight: 600 }}>{item.product.price.toLocaleString()} ₽</p>
+                      <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat', letterSpacing: 1 }}>Кол-во: {item.quantity}</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <button onClick={() => handleAdd(item.productId)} style={{ width: 32, height: 32, backgroundColor: '#008000', color: '#fff', border: 'none', fontSize: 16, cursor: 'pointer', fontFamily: 'Montserrat' }}>+</button>
+                      <button onClick={() => handleRemove(item.productId)} style={{ width: 32, height: 32, backgroundColor: '#888', color: '#fff', border: 'none', fontSize: 16, cursor: 'pointer', fontFamily: 'Montserrat' }}>−</button>
+                      <button onClick={() => handleDelete(item.id)} style={{ width: 32, height: 32, backgroundColor: '#FF0000', color: '#fff', border: 'none', fontSize: 12, cursor: 'pointer', fontFamily: 'Montserrat' }}>✕</button>
+                    </div>
+                    <p className="serif" style={{ fontSize: 18, color: '#1A1A1A', fontWeight: 600, minWidth: 100, textAlign: 'right' }}>
+                      {(item.quantity * item.product.price).toLocaleString()} ₽
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
 
-      {/* Модальное окно оформления заказа */}
+            {/* Итого */}
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '28px 32px', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+              <div>
+                <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Totale</p>
+                <p className="serif" style={{ fontSize: 28, color: '#FF0000', fontWeight: 600 }}>{totalPrice.toLocaleString()} ₽</p>
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button onClick={handleClear} className="btn-secondary">Очистить</button>
+                <button onClick={() => setShowCheckout(true)} className="btn-primary">Оформить заказ</button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {orderCompleted && (
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <button onClick={() => navigate("/orderHistory")} className="btn-green">Посмотреть заказы</button>
+          </div>
+        )}
+      </div>
+
+      {/* Модальное окно */}
       {showCheckout && (
-        <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/25 animate-fadeIn">
-          <div className="bg-white shadow-2xl p-6 rounded-3xl w-full max-w-md animate-scaleUp">
-            <h3 className="mb-6 font-extrabold text-blue-900 text-2xl text-center">Форма заказа</h3>
-            <div className="flex flex-col gap-4">
-              <input
-                type="text"
-                placeholder="Имя"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="p-3 border rounded-2xl focus:outline-blue-500 w-full"
-              />
-              <input
-                type="text"
-                placeholder="Телефон"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="p-3 border rounded-2xl focus:outline-blue-500 w-full"
-              />
-              <input
-                type="text"
-                placeholder="Адрес"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="p-3 border rounded-2xl focus:outline-blue-500 w-full"
-              />
-              <div className="flex sm:flex-row flex-col gap-3 mt-4">
-                <button
-                  onClick={handleCheckout}
-                  disabled={orderLoading}
-                  className="bg-gradient-to-r from-green-500 hover:from-green-600 to-green-600 hover:to-green-700 px-6 py-3 rounded-2xl w-full sm:w-1/2 font-bold text-white hover:scale-105 transition-transform transform"
-                >
-                  {orderLoading ? "Создание..." : "Создать заказ"}
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div className="animate-scaleUp" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '48px 40px', width: '100%', maxWidth: 480 }}>
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+              <h2 className="serif" style={{ fontSize: 24, color: '#8B0000', letterSpacing: 3, fontWeight: 500 }}>Форма заказа</h2>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 12 }}>
+                <div style={{ width: 20, height: 1, backgroundColor: '#008000' }} />
+                <div style={{ width: 4, height: 4, backgroundColor: '#FF0000', borderRadius: '50%' }} />
+                <div style={{ width: 20, height: 1, backgroundColor: '#FF0000' }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <input placeholder="Имя" value={name} onChange={e => setName(e.target.value)} />
+              <input placeholder="Телефон" value={phone} onChange={e => setPhone(e.target.value)} />
+              <input placeholder="Адрес доставки" value={address} onChange={e => setAddress(e.target.value)} />
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                <button onClick={handleCheckout} disabled={orderLoading} className="btn-primary" style={{ flex: 1, textAlign: 'center', opacity: orderLoading ? 0.7 : 1 }}>
+                  {orderLoading ? "..." : "Создать заказ"}
                 </button>
-                <button
-                  onClick={() => setShowCheckout(false)}
-                  className="bg-gray-400 hover:bg-gray-500 px-6 py-3 rounded-2xl w-full sm:w-1/2 font-bold text-white hover:scale-105 transition-transform transform"
-                >
+                <button onClick={() => setShowCheckout(false)} className="btn-secondary" style={{ flex: 1, textAlign: 'center' }}>
                   Отмена
                 </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {orderCompleted && (
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => navigate("/orderHistory")}
-            className="bg-gradient-to-r from-purple-600 hover:from-purple-700 to-purple-700 hover:to-purple-800 px-6 py-3 rounded-2xl font-bold text-white hover:scale-105 transition-transform transform"
-          >
-            Посмотреть историю заказов
-          </button>
         </div>
       )}
     </div>
