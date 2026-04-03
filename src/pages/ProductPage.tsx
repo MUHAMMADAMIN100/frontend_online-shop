@@ -44,7 +44,7 @@ export default function ProductPage() {
         {/* Фото */}
         <div style={{ flex: '1 1 400px', overflow: 'hidden', maxHeight: 540 }}>
           <img
-            src={product.image || "https://via.placeholder.com/600x540?text=OLIMPIA"}
+            src={product.image || "https://via.placeholder.com/600x540?text=DORRO"}
             alt={product.name}
             style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s' }}
             onMouseEnter={e => (e.target as HTMLElement).style.transform = 'scale(1.04)'}

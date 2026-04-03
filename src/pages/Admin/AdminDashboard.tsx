@@ -38,9 +38,9 @@ const AdminDashboard: React.FC = () => {
       {/* Admin Header */}
       <div style={{ backgroundColor: '#8B0000', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ width: 40, height: 40, border: '1.5px solid #FFFFFF', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Playfair Display', serif", color: '#FFFFFF', fontSize: 14, fontWeight: 600 }}>OS</div>
+          <div style={{ width: 40, height: 40, border: '1.5px solid #FFFFFF', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Playfair Display', serif", color: '#FFFFFF', fontSize: 14, fontWeight: 600 }}>DR</div>
           <div>
-            <h1 className="serif" style={{ color: '#FFFFFF', fontSize: 20, letterSpacing: 4, fontWeight: 500, margin: 0 }}>OLIMPIA</h1>
+            <h1 className="serif" style={{ color: '#FFFFFF', fontSize: 20, letterSpacing: 4, fontWeight: 500, margin: 0 }}>DORRO</h1>
             <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'Montserrat', margin: 0 }}>Pannello Amministratore</p>
           </div>
         </div>

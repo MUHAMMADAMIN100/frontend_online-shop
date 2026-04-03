@@ -34,28 +34,32 @@ export default function Navbar() {
 
           {/* Лого */}
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            {/* Монограмма */}
+            {/* Монограмма DR */}
             <div style={{
-              width: 52, height: 52,
+              width: 54, height: 54,
               border: '1.5px solid #8B0000',
               borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: "'Playfair Display', serif",
-              color: '#8B0000', fontSize: 17, fontWeight: 600, letterSpacing: 1,
-              marginBottom: 2
+              color: '#8B0000', fontSize: 19, fontWeight: 600, letterSpacing: -1,
+              marginBottom: 4, position: 'relative'
             }}>
-              OS
+              <span style={{ fontStyle: 'italic' }}>D</span><span>R</span>
             </div>
             <span style={{
               fontFamily: "'Playfair Display', serif",
-              fontSize: 24, letterSpacing: 8,
+              fontSize: 26, letterSpacing: 8,
               color: '#8B0000', fontWeight: 600,
               lineHeight: 1
             }}>
-              OLIMPIA
+              DORRO
             </span>
-            <span style={{ fontSize: 8, letterSpacing: 4, color: '#999', fontFamily: 'Montserrat', textTransform: 'uppercase' }}>
-              Sport Atelier · 2024
+            <div style={{ width: '100%', height: 1, backgroundColor: '#8B0000', margin: '3px 0' }} />
+            <span style={{ fontSize: 7, letterSpacing: 4, color: '#8B0000', fontFamily: 'Montserrat', textTransform: 'uppercase' }}>
+              Italian Atelier
+            </span>
+            <span style={{ fontSize: 7, letterSpacing: 3, color: '#8B0000', fontFamily: 'Montserrat' }}>
+              1991
             </span>
           </Link>
 

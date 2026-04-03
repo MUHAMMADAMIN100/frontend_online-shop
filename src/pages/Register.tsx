@@ -47,12 +47,12 @@ export default function RegisterPage() {
             margin: '0 auto 16px',
             fontFamily: "'Playfair Display', serif",
             color: '#8B0000', fontSize: 20, fontWeight: 600
-          }}>OS</div>
+          }}>DR</div>
           <h1 className="serif" style={{ fontSize: 28, color: '#8B0000', letterSpacing: 6, fontWeight: 500, marginBottom: 4 }}>
-            OLIMPIA
+            DORRO
           </h1>
           <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#999', fontFamily: 'Montserrat' }}>
-            Sport Atelier · Регистрация
+            Italian Atelier · Регистрация
           </p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 16 }}>
             <div style={{ width: 30, height: 1, backgroundColor: '#008000' }} />

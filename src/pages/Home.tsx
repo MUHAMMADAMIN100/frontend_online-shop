@@ -102,7 +102,7 @@ export default function Home() {
               {/* Фото */}
               <div style={{ position: 'relative', overflow: 'hidden', height: 260 }}>
                 <img
-                  src={product.image || "https://via.placeholder.com/400x300?text=OLIMPIA"}
+                  src={product.image || "https://via.placeholder.com/400x300?text=DORRO"}
                   alt={product.name}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
                   onMouseEnter={e => (e.target as HTMLElement).style.transform = 'scale(1.05)'}
