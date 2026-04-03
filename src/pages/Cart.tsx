@@ -11,6 +11,7 @@ const Cart: React.FC = () => {
   const { items, loading } = useSelector((state: RootState) => state.cart);
   const { token } = useSelector((state: RootState) => state.auth);
 
+  const [initialLoad, setInitialLoad] = useState(true);
   const [showCheckout, setShowCheckout] = useState(false);
   const [orderCompleted, setOrderCompleted] = useState(false);
   const [name, setName] = useState("");
@@ -18,7 +19,9 @@ const Cart: React.FC = () => {
   const [address, setAddress] = useState("");
   const [orderLoading, setOrderLoading] = useState(false);
 
-  useEffect(() => { dispatch(fetchCart()); }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchCart()).finally(() => setInitialLoad(false));
+  }, [dispatch]);
 
   const handleAdd = (productId: number) => dispatch(addToCart({ productId, quantity: 1 }));
   const handleRemove = (productId: number) => {
@@ -59,7 +62,7 @@ const Cart: React.FC = () => {
     } finally { setOrderLoading(false); }
   };
 
-  if (loading) return (
+  if (initialLoad && loading) return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
       <p className="serif" style={{ color: '#8B0000', fontSize: 18, letterSpacing: 3 }}>Caricamento...</p>
     </div>
