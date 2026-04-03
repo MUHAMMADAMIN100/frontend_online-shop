@@ -49,7 +49,6 @@ const AdminDashboard: React.FC = () => {
         </button>
       </div>
 
-      <div style={{ tricolor: 0 }} />
       <div className="tricolor" />
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px' }}>
