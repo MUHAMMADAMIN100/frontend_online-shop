@@ -40,14 +40,7 @@ export default function RegisterPage() {
 
         {/* Лого */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
-            <svg width="72" height="80" viewBox="0 0 124 136" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M 62 7 A 55 55 0 1 0 112 88" stroke="#8B0000" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-              <path d="M 112 88 C 124 98 122 118 108 116 C 94 114 86 100 92 86" stroke="#8B0000" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-              <text x="14" y="88" fontFamily="'Playfair Display', Georgia, serif" fontSize="72" fill="#8B0000" fontStyle="italic" fontWeight="400">D</text>
-              <text x="60" y="88" fontFamily="'Playfair Display', Georgia, serif" fontSize="72" fill="#8B0000" fontWeight="400">R</text>
-            </svg>
-          </div>
+          <img src="/image.png" alt="DORRO" style={{ width: 80, height: 80, objectFit: 'contain', margin: '0 auto 8px', display: 'block' }} />
           <h1 className="serif" style={{ fontSize: 28, color: '#8B0000', letterSpacing: 6, fontWeight: 500, marginBottom: 4 }}>
             DORRO
           </h1>

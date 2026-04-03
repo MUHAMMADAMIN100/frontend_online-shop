@@ -34,31 +34,7 @@ export default function Navbar() {
 
           {/* Лого */}
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            {/* SVG монограмма DR — точная копия логотипа */}
-            <svg width="62" height="68" viewBox="0 0 124 136" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Круг — почти полный, с открытием справа */}
-              <path
-                d="M 62 7 A 55 55 0 1 0 112 88"
-                stroke="#8B0000" strokeWidth="2.2" fill="none" strokeLinecap="round"
-              />
-              {/* Декоративный росчерк */}
-              <path
-                d="M 112 88 C 124 98 122 118 108 116 C 94 114 86 100 92 86"
-                stroke="#8B0000" strokeWidth="2.2" fill="none" strokeLinecap="round"
-              />
-              {/* Буква D — курсив */}
-              <text x="14" y="88"
-                fontFamily="'Playfair Display', Georgia, serif"
-                fontSize="72" fill="#8B0000"
-                fontStyle="italic" fontWeight="400"
-              >D</text>
-              {/* Буква R — прямая */}
-              <text x="60" y="88"
-                fontFamily="'Playfair Display', Georgia, serif"
-                fontSize="72" fill="#8B0000"
-                fontWeight="400"
-              >R</text>
-            </svg>
+            <img src="/image.png" alt="DORRO" style={{ width: 64, height: 64, objectFit: 'contain' }} />
             <span style={{
               fontFamily: "'Playfair Display', serif",
               fontSize: 26, letterSpacing: 8,
