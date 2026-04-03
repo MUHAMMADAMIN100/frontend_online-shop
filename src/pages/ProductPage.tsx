@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import Swal from "sweetalert2";
+import { notify } from "../utils/swal";
 import type { AppDispatch, RootState } from "../app/store";
 import { addToCart } from "../features/cart/cartSlice";
 
@@ -20,14 +20,14 @@ export default function ProductPage() {
 
   const handleAdd = async () => {
     if (!token) {
-      Swal.fire({ icon: 'warning', title: 'Войдите в аккаунт', text: 'Необходима авторизация', confirmButtonColor: '#FF0000' });
+      notify.warning('Войдите в аккаунт', 'Для добавления товара необходима авторизация');
       return;
     }
     try {
       await dispatch(addToCart({ productId: product.id, quantity: 1 })).unwrap();
-      Swal.fire({ icon: 'success', title: 'Aggiunto al carrello!', timer: 1200, showConfirmButton: false });
+      notify.addedToCart();
     } catch {
-      Swal.fire({ icon: 'error', title: 'Errore', text: 'Не удалось добавить товар', confirmButtonColor: '#FF0000' });
+      notify.error('Errore', 'Не удалось добавить товар');
     }
   };
 

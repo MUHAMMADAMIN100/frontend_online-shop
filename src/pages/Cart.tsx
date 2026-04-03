@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+import { notify } from "../utils/swal";
 import { fetchCart, addToCart, removeFromCart, clearCart } from "../features/cart/cartSlice";
 import type { RootState } from "../app/store";
 
@@ -28,18 +28,15 @@ const Cart: React.FC = () => {
   };
   const handleDelete = (cartItemId: number) => dispatch(removeFromCart(cartItemId));
   const handleClear = () => {
-    Swal.fire({
-      title: "Очистить корзину?", icon: "warning",
-      showCancelButton: true, confirmButtonColor: "#FF0000", cancelButtonColor: "#888",
-      confirmButtonText: "Да", cancelButtonText: "Отмена"
-    }).then(r => { if (r.isConfirmed) { dispatch(clearCart()); } });
+    notify.confirm("Очистить корзину?", "Все товары будут удалены")
+      .then(r => { if (r.isConfirmed) dispatch(clearCart()); });
   };
 
   const totalPrice = items.reduce((sum, item) => sum + item.quantity * item.product.price, 0);
 
   const handleCheckout = async () => {
     if (!name || !phone || !address) {
-      Swal.fire({ icon: "warning", title: "Заполните все поля", confirmButtonColor: '#FF0000' });
+      notify.warning("Заполните все поля", "Имя, телефон и адрес обязательны");
       return;
     }
     setOrderLoading(true);
@@ -50,14 +47,15 @@ const Cart: React.FC = () => {
         body: JSON.stringify({ customerName: name, phone, address, items: items.map(i => ({ productId: i.productId, quantity: i.quantity })) }),
       });
       if (response.ok) {
-        Swal.fire({ icon: "success", title: "Ordine creato!", showConfirmButton: false, timer: 1500 });
-        dispatch(clearCart()); setShowCheckout(false); setOrderCompleted(true);
+        setShowCheckout(false);
+        await notify.orderCreated();
+        dispatch(clearCart()); setOrderCompleted(true);
         setName(""); setPhone(""); setAddress("");
       } else {
-        Swal.fire("Errore", "Не удалось создать заказ", "error");
+        notify.error("Errore", "Не удалось создать заказ");
       }
     } catch {
-      Swal.fire("Errore", "Не удалось создать заказ", "error");
+      notify.error("Errore", "Не удалось создать заказ");
     } finally { setOrderLoading(false); }
   };
 

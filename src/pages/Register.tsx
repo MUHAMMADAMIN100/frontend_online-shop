@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import Swal from "sweetalert2"
+import { notify } from "../utils/swal"
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("")
@@ -19,13 +19,13 @@ export default function RegisterPage() {
       })
       const data = await res.json()
       if (res.ok) {
-        Swal.fire({ icon: "success", title: "Registrazione completata!", text: "Вы можете войти в систему.", timer: 1800, showConfirmButton: false, confirmButtonColor: '#FF0000' })
+        await notify.registered()
         navigate("/login")
       } else {
-        Swal.fire({ icon: "error", title: "Errore", text: data.message || "Ошибка при регистрации", confirmButtonColor: '#FF0000' })
+        notify.error('Errore di registrazione', data.message || "Ошибка при регистрации")
       }
     } catch {
-      Swal.fire({ icon: "error", title: "Errore di connessione", text: "Не удалось соединиться с сервером", confirmButtonColor: '#FF0000' })
+      notify.error('Errore di connessione', "Не удалось соединиться с сервером")
     } finally {
       setLoading(false)
     }

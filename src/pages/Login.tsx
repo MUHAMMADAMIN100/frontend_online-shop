@@ -2,9 +2,9 @@ import type React from "react"
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useDispatch } from "react-redux"
-import Swal from "sweetalert2"
 import { setCredentials } from "../features/auth/authSlice"
 import type { AppDispatch } from "../app/store"
+import { notify } from "../utils/swal"
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("")
@@ -25,14 +25,14 @@ const LoginPage: React.FC = () => {
       const data = await res.json()
       if (res.ok) {
         dispatch(setCredentials({ token: data.access_token, role: data.user.role }))
-        Swal.fire({ icon: 'success', title: 'Benvenuto!', text: 'Добро пожаловать!', timer: 1500, showConfirmButton: false, confirmButtonColor: '#FF0000' })
+        notify.welcome(data.user.role)
         if (data.user.role === "ADMIN") navigate("/admin")
         else navigate("/")
       } else {
-        Swal.fire({ icon: 'error', title: 'Errore', text: data.message || 'Проверьте email и пароль', confirmButtonColor: '#FF0000' })
+        notify.error('Errore di accesso', data.message || 'Проверьте email и пароль')
       }
     } catch {
-      Swal.fire({ icon: 'error', title: 'Errore di connessione', text: 'Не удалось подключиться к серверу', confirmButtonColor: '#FF0000' })
+      notify.error('Errore di connessione', 'Не удалось подключиться к серверу')
     } finally {
       setLoading(false)
     }

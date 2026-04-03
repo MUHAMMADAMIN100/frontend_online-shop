@@ -154,6 +154,117 @@ input:focus, select:focus, textarea:focus {
   box-shadow: none !important;
 }
 
+/* ── SweetAlert2 Italian Style ── */
+
+.iswal-popup {
+  border-radius: 0 !important;
+  border: 1px solid #D9CFC0 !important;
+  padding: 44px 52px !important;
+  font-family: 'Montserrat', sans-serif !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+}
+
+.iswal-title {
+  font-family: 'Playfair Display', serif !important;
+  color: #8B0000 !important;
+  font-size: 22px !important;
+  font-weight: 500 !important;
+  letter-spacing: 2px !important;
+  padding: 0 !important;
+  margin-bottom: 8px !important;
+}
+
+.iswal-text {
+  color: #666 !important;
+  font-size: 12px !important;
+  letter-spacing: 1px !important;
+  font-family: 'Montserrat', sans-serif !important;
+  line-height: 1.7 !important;
+}
+
+.iswal-icon {
+  border: none !important;
+  margin-bottom: 16px !important;
+}
+
+.iswal-btn-confirm {
+  background-color: #FF0000 !important;
+  color: #FFFFFF !important;
+  padding: 11px 36px !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3px !important;
+  text-transform: uppercase !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s !important;
+  margin: 0 6px !important;
+}
+
+.iswal-btn-confirm:hover {
+  background-color: #8B0000 !important;
+}
+
+.iswal-btn-cancel {
+  background-color: transparent !important;
+  color: #888 !important;
+  padding: 11px 36px !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3px !important;
+  text-transform: uppercase !important;
+  border: 1px solid #D9CFC0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  margin: 0 6px !important;
+}
+
+.iswal-btn-cancel:hover {
+  border-color: #888 !important;
+  color: #555 !important;
+}
+
+.iswal-timer {
+  background: #FF0000 !important;
+  height: 2px !important;
+}
+
+/* Toast стиль */
+.iswal-toast {
+  border-radius: 0 !important;
+  border-left: 3px solid #FF0000 !important;
+  border-top: 1px solid #D9CFC0 !important;
+  border-right: 1px solid #D9CFC0 !important;
+  border-bottom: 1px solid #D9CFC0 !important;
+  padding: 14px 20px !important;
+  font-family: 'Montserrat', sans-serif !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+  min-width: 280px !important;
+}
+
+.iswal-toast.swal2-icon-success { border-left-color: #008000 !important; }
+.iswal-toast.swal2-icon-error { border-left-color: #FF0000 !important; }
+.iswal-toast.swal2-icon-warning { border-left-color: #CC8800 !important; }
+
+.iswal-toast-title {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+  color: #1A1A1A !important;
+}
+
+.swal2-html-container.iswal-toast-title {
+  font-size: 11px !important;
+  color: #888 !important;
+}
+
+/* ── end SweetAlert2 ── */
+
 @keyframes scaleUp {
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
