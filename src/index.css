@@ -422,3 +422,22 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 4px 24px rgba(0,0,0,0.10) !important;
   backdrop-filter: blur(8px);
 }
+
+/* Compact inputs inside navbar */
+.nav-filter {
+  padding: 7px 11px !important;
+  font-size: 11px !important;
+  letter-spacing: 0.5px !important;
+  border: 1px solid #D9CFC0 !important;
+  height: 36px !important;
+  border-radius: 0 !important;
+}
+.nav-filter:focus {
+  border-color: #008000 !important;
+  box-shadow: none !important;
+}
+
+/* Profile dropdown link hover */
+.profile-link:hover {
+  background-color: #F7F4EF !important;
+}
