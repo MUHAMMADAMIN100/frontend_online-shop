@@ -26,6 +26,29 @@ interface Product {
 
 const IMG_H = 520;
 
+/** Derive a CSS filter that tints the image to match the given hex colour */
+function getColorFilter(hex: string): string {
+  if (!hex) return 'none';
+  const r = parseInt(hex.slice(1,3),16)/255;
+  const g = parseInt(hex.slice(3,5),16)/255;
+  const b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  const l = (max+min)/2;
+  if (l < 0.13) return 'brightness(0.15) saturate(0.1)';       // near-black
+  if (l > 0.93) return 'brightness(1.6) saturate(0.08)';        // near-white
+  const s = max===min ? 0 : l<0.5 ? (max-min)/(max+min) : (max-min)/(2-max-min);
+  if (s < 0.08) return `grayscale(1) brightness(${(l*1.5).toFixed(1)})`;  // gray
+  let h = 0;
+  if (max===r) h = ((g-b)/(max-min))%6;
+  else if (max===g) h = (b-r)/(max-min)+2;
+  else h = (r-g)/(max-min)+4;
+  h = Math.round(h*60); if(h<0) h+=360;
+  const rot = h - 30;  // sepia base ≈ hue 30°
+  const br = Math.max(0.35, Math.min(0.9, l*1.8)).toFixed(1);
+  const sat = Math.min(12, Math.round(s*10+3));
+  return `sepia(1) saturate(${sat}) hue-rotate(${rot}deg) brightness(${br})`;
+}
+
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct]         = useState<Product | null>(null);
@@ -131,7 +154,11 @@ export default function ProductPage() {
                 >
                   <img
                     src={img} alt=""
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    style={{
+                      width: "100%", height: "100%", objectFit: "cover", display: "block",
+                      filter: getColorFilter(selectedColor?.hex ?? ''),
+                      transition: "filter 0.3s ease"
+                    }}
                   />
                 </button>
               ))}
@@ -159,7 +186,8 @@ export default function ProductPage() {
                 objectFit: "cover", display: "block",
                 opacity: imgFading ? 0 : 1,
                 transform: imgFading ? "scale(1.02)" : "scale(1)",
-                transition: "opacity 0.18s ease, transform 0.18s ease"
+                filter: getColorFilter(selectedColor?.hex ?? ''),
+                transition: "opacity 0.18s ease, transform 0.18s ease, filter 0.35s ease"
               }}
             />
           </div>

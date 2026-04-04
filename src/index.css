@@ -187,7 +187,6 @@ input:focus, select:focus, textarea:focus {
   font-family: 'Montserrat', sans-serif !important;
   background: #FFFFFF !important;
   box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
-  animation: scaleUp 0.25s ease-out !important;
 }
 .iswal-title {
   font-family: 'Playfair Display', serif !important;
