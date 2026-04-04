@@ -53,7 +53,7 @@ export const notify = {
     italianToast.fire({
       icon: 'success',
       title: 'Benvenuto!',
-      text: role === 'ADMIN' ? 'Добро пожаловать, amministratore' : 'Добро пожаловать в OLIMPIA',
+      text: role === 'ADMIN' ? 'Добро пожаловать, amministratore' : 'Добро пожаловать в DORRO',
     }),
 
   registered: () =>
