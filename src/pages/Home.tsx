@@ -50,7 +50,7 @@ export default function Home() {
     <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh', padding: '60px 40px' }}>
 
       {/* Заголовок */}
-      <div style={{ textAlign: 'center', marginBottom: 60 }}>
+      <div className="animate-slideInUp" style={{ textAlign: 'center', marginBottom: 60 }}>
         <p style={{ fontSize: 10, letterSpacing: 5, textTransform: 'uppercase', color: '#008000', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 12 }}>
           Collezione Primavera
         </p>
@@ -97,7 +97,7 @@ export default function Home() {
       {/* Сетка товаров */}
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 28 }}>
         {filtered.map(product => (
-          <div key={product.id} className="italian-card animate-fadeIn" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div key={product.id} className="italian-card card-stagger" style={{ display: 'flex', flexDirection: 'column' }}>
             <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', display: 'block' }}>
               {/* Фото */}
               <div style={{ position: 'relative', overflow: 'hidden', height: 260 }}>
