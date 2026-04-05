@@ -183,7 +183,7 @@ const StatCard = ({ label, value, sub, color = "#1A1A1A" }: { label: string; val
 
 // ── Chart Card ────────────────────────────────────────────────────────────────
 const ChartCard = ({ title, subtitle, children, hint }: { title: string; subtitle?: string; children: React.ReactNode; hint?: boolean }) => (
-  <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #D9CFC0", padding: "24px" }}>
+  <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #D9CFC0", padding: "24px", minWidth: 0, overflow: "hidden" }}>
     {subtitle && <p style={{ fontSize: 9, letterSpacing: 3, textTransform: "uppercase", color: "#008000", fontFamily: "Montserrat", fontWeight: 600, marginBottom: 4 }}>{subtitle}</p>}
     <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 18 }}>
       <p style={{ fontSize: 15, color: "#1A1A1A", fontFamily: "Montserrat", fontWeight: 600, margin: 0 }}>{title}</p>
@@ -253,22 +253,33 @@ function ProductDetailPanel({ product, totalRevenue, totalSold, colorIdx, onClos
   );
 }
 
+const PERIODS = [
+  { key: "allTime",   label: "За всё время" },
+  { key: "thisYear",  label: "Этот год" },
+  { key: "thisMonth", label: "Этот месяц" },
+  { key: "lastMonth", label: "Прошлый месяц" },
+  { key: "lastYear",  label: "Прошлый год" },
+];
+
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function Analytics() {
   const { token } = useSelector((state: RootState) => state.auth);
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [period, setPeriod] = useState("allTime");
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/admin/analytics`, {
+    setLoading(true);
+    setSelectedProduct(null);
+    fetch(`${import.meta.env.VITE_API_URL}/admin/analytics?period=${period}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(r => r.json())
       .then(d => setData(d))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, period]);
 
   if (loading) return <LoadingLogo height="300px" size={64} />;
   if (!data) return <p style={{ textAlign: "center", color: "#888", fontFamily: "Montserrat", padding: 40 }}>Не удалось загрузить аналитику</p>;
@@ -300,6 +311,27 @@ export default function Analytics() {
         <p style={{ fontSize: 9, letterSpacing: 4, textTransform: "uppercase", color: "#008000", fontFamily: "Montserrat", fontWeight: 600, marginBottom: 4 }}>Статистика</p>
         <h2 className="serif" style={{ fontSize: 24, color: "#8B0000", fontWeight: 500 }}>Аналитика</h2>
         <div style={{ width: 40, height: 2, backgroundColor: "#FF0000", marginTop: 8 }} />
+      </div>
+
+      {/* Период */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 24 }}>
+        {PERIODS.map(p => (
+          <button
+            key={p.key}
+            onClick={() => setPeriod(p.key)}
+            style={{
+              padding: "7px 16px",
+              fontFamily: "Montserrat", fontSize: 10, letterSpacing: 2, textTransform: "uppercase",
+              border: period === p.key ? "1px solid #8B0000" : "1px solid #D9CFC0",
+              backgroundColor: period === p.key ? "#8B0000" : "#FFFFFF",
+              color: period === p.key ? "#FFFFFF" : "#555",
+              cursor: "pointer",
+              transition: "all 0.15s",
+            }}
+          >
+            {p.label}
+          </button>
+        ))}
       </div>
 
       {/* KPI */}
