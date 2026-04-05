@@ -29,10 +29,10 @@ const LoginPage: React.FC = () => {
         if (data.user.role === "ADMIN") navigate("/admin")
         else navigate("/")
       } else {
-        notify.error('Errore di accesso', data.message || 'Проверьте email и пароль')
+        notify.error('Ошибка входа', data.message || 'Проверьте email и пароль')
       }
     } catch {
-      notify.error('Errore di connessione', 'Не удалось подключиться к серверу')
+      notify.error('Ошибка соединения', 'Не удалось подключиться к серверу')
     } finally {
       setLoading(false)
     }
@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
             DORRO
           </h1>
           <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#999', fontFamily: 'Montserrat' }}>
-            Italian Atelier · Вход
+            Вход в аккаунт
           </p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 16 }}>
             <div style={{ width: 30, height: 1, backgroundColor: '#008000' }} />

@@ -4,7 +4,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { notify } from "../utils/swal";
 import type { AppDispatch, RootState } from "../app/store";
-import { addToCart } from "../features/cart/cartSlice";
+import { addToCart, optimisticAdd, optimisticRemove } from "../features/cart/cartSlice";
 import LoadingLogo from "../components/LoadingLogo";
 
 interface ColorVariant {
@@ -103,15 +103,24 @@ export default function ProductPage() {
       notify.warning("Уже в корзине", "Этот товар уже добавлен в корзину. Измените количество в корзине.");
       return;
     }
+
+    // Мгновенное обновление UI
+    dispatch(optimisticAdd({
+      id: -(product!.id),
+      productId: product!.id,
+      quantity: 1,
+      product: { id: product!.id, name: product!.name, description: product!.description || '', price: product!.price, image: product!.image }
+    }));
+    notify.addedToCart();
     setAddingToCart(true);
-    try {
-      await dispatch(addToCart({ productId: product!.id, quantity: 1 })).unwrap();
-      notify.addedToCart();
-    } catch {
-      notify.error("Errore", "Не удалось добавить товар");
-    } finally {
-      setTimeout(() => setAddingToCart(false), 600);
-    }
+
+    // Фоновая синхронизация
+    dispatch(addToCart({ productId: product!.id, quantity: 1 }))
+      .catch(() => {
+        dispatch(optimisticRemove(-(product!.id)));
+        notify.error("Ошибка", "Не удалось добавить товар");
+      })
+      .finally(() => setTimeout(() => setAddingToCart(false), 400));
   };
 
   /** Все фото выбранного цвета (или дефолтное фото) */

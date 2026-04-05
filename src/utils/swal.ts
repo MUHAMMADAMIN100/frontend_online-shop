@@ -52,29 +52,29 @@ export const notify = {
   welcome: (role?: string) =>
     italianToast.fire({
       icon: 'success',
-      title: 'Benvenuto!',
-      text: role === 'ADMIN' ? 'Добро пожаловать, amministratore' : 'Добро пожаловать в DORRO',
+      title: 'Добро пожаловать!',
+      text: role === 'ADMIN' ? 'Добро пожаловать, администратор' : 'Добро пожаловать в DORRO',
     }),
 
   registered: () =>
     italianToast.fire({
       icon: 'success',
-      title: 'Registrazione completata!',
+      title: 'Регистрация завершена!',
       text: 'Аккаунт успешно создан',
     }),
 
   addedToCart: () =>
     italianToast.fire({
       icon: 'success',
-      title: 'Aggiunto al carrello',
+      title: 'Добавлено в корзину',
       text: 'Товар добавлен в корзину',
     }),
 
   orderCreated: () =>
     italianSwal.fire({
       icon: 'success',
-      title: 'Ordine creato!',
+      title: 'Заказ оформлен!',
       text: 'Ваш заказ успешно оформлен',
-      confirmButtonText: 'Grazie',
+      confirmButtonText: 'Отлично',
     }),
 };

@@ -22,10 +22,10 @@ export default function RegisterPage() {
         await notify.registered()
         navigate("/login")
       } else {
-        notify.error('Errore di registrazione', data.message || "Ошибка при регистрации")
+        notify.error('Ошибка регистрации', data.message || "Ошибка при регистрации")
       }
     } catch {
-      notify.error('Errore di connessione', "Не удалось соединиться с сервером")
+      notify.error('Ошибка соединения', "Не удалось соединиться с сервером")
     } finally {
       setLoading(false)
     }
@@ -45,7 +45,7 @@ export default function RegisterPage() {
             DORRO
           </h1>
           <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#999', fontFamily: 'Montserrat' }}>
-            Italian Atelier · Регистрация
+            Создать аккаунт
           </p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 16 }}>
             <div style={{ width: 30, height: 1, backgroundColor: '#008000' }} />

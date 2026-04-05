@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
+import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit"
 import axios from "axios"
 import type { RootState } from "../../app/store"
 import jwt_decode from "jwt-decode"
@@ -178,6 +178,19 @@ const cartSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
+    // Мгновенно добавляет товар в Redux (до ответа сервера)
+    optimisticAdd: (state, action: PayloadAction<CartItem>) => {
+      const existing = state.items.find((i) => i.productId === action.payload.productId)
+      if (existing) {
+        existing.quantity += action.payload.quantity
+      } else {
+        state.items.push(action.payload)
+      }
+    },
+    // Мгновенно убирает товар из Redux (до ответа сервера)
+    optimisticRemove: (state, action: PayloadAction<number>) => {
+      state.items = state.items.filter((i) => i.id !== action.payload)
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -194,15 +207,13 @@ const cartSlice = createSlice({
         state.loading = false
         state.error = action.payload as string
       })
-      .addCase(addToCart.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
+      // addToCart: не трогаем loading (оптимистичное обновление уже сделано)
+      .addCase(addToCart.pending, (_state) => { /* optimistic — no spinner */ })
       .addCase(addToCart.fulfilled, (state, action) => {
-        state.loading = false
         const item = action.payload
         const existing = state.items.find((i) => i.productId === item.productId)
         if (existing) {
+          existing.id = item.id       // заменяем temp id на реальный
           existing.quantity = item.quantity
         } else {
           state.items.push(item)
@@ -210,20 +221,14 @@ const cartSlice = createSlice({
         state.error = null
       })
       .addCase(addToCart.rejected, (state, action) => {
-        state.loading = false
         state.error = action.payload as string
       })
-      .addCase(removeFromCart.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(removeFromCart.fulfilled, (state, action) => {
-        state.loading = false
-        state.items = state.items.filter((i) => i.id !== action.payload)
+      // removeFromCart: уже удалён оптимистично, ответ сервера — no-op
+      .addCase(removeFromCart.pending, (_state) => { /* optimistic — no spinner */ })
+      .addCase(removeFromCart.fulfilled, (state) => {
         state.error = null
       })
       .addCase(removeFromCart.rejected, (state, action) => {
-        state.loading = false
         state.error = action.payload as string
       })
       .addCase(clearCart.pending, (state) => {
@@ -242,5 +247,5 @@ const cartSlice = createSlice({
   },
 })
 
-export const { clearError } = cartSlice.actions
+export const { clearError, optimisticAdd, optimisticRemove } = cartSlice.actions
 export default cartSlice.reducer

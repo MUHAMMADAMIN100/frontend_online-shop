@@ -4,7 +4,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { notify } from "../utils/swal";
 import type { AppDispatch, RootState } from "../app/store";
-import { addToCart } from "../features/cart/cartSlice";
+import { addToCart, optimisticAdd, optimisticRemove } from "../features/cart/cartSlice";
 import LoadingLogo from "../components/LoadingLogo";
 
 export default function Home() {
@@ -37,7 +37,7 @@ export default function Home() {
     return true;
   });
 
-  const handleAdd = async (productId: number) => {
+  const handleAdd = (productId: number) => {
     if (!token) {
       notify.warning("Войдите в аккаунт", "Для добавления товара необходима авторизация");
       return;
@@ -47,12 +47,23 @@ export default function Home() {
       notify.warning("Уже в корзине", "Этот товар уже добавлен в корзину. Измените количество в корзине.");
       return;
     }
-    try {
-      await dispatch(addToCart({ productId, quantity: 1 })).unwrap();
-      notify.addedToCart();
-    } catch {
-      notify.error("Errore", "Не удалось добавить товар");
-    }
+    const product = filtered.find(p => p.id === productId);
+    if (!product) return;
+
+    // Мгновенное обновление UI
+    dispatch(optimisticAdd({
+      id: -productId,
+      productId,
+      quantity: 1,
+      product: { id: product.id, name: product.name, description: product.description || '', price: product.price, image: product.image }
+    }));
+    notify.addedToCart();
+
+    // Фоновая синхронизация с сервером
+    dispatch(addToCart({ productId, quantity: 1 })).catch(() => {
+      dispatch(optimisticRemove(-productId));
+      notify.error("Ошибка", "Не удалось добавить товар");
+    });
   };
 
   if (loading) return <LoadingLogo height="80vh" />;
@@ -63,7 +74,7 @@ export default function Home() {
       {/* Заголовок */}
       <div className="animate-slideInUp" style={{ textAlign: "center", marginBottom: 60 }}>
         <p style={{ fontSize: 10, letterSpacing: 5, textTransform: "uppercase", color: "#008000", fontFamily: "Montserrat", fontWeight: 600, marginBottom: 12 }}>
-          Collezione Primavera
+          Новая коллекция
         </p>
         <h1 className="serif" style={{ fontSize: 42, color: "#8B0000", letterSpacing: 4, fontWeight: 500, marginBottom: 16 }}>
           Наша Коллекция

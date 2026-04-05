@@ -184,7 +184,7 @@ export default function Analytics() {
     <div>
       {/* Заголовок */}
       <div style={{ marginBottom: 28 }}>
-        <p style={{ fontSize: 9, letterSpacing: 4, textTransform: "uppercase", color: "#008000", fontFamily: "Montserrat", fontWeight: 600, marginBottom: 4 }}>Analisi</p>
+        <p style={{ fontSize: 9, letterSpacing: 4, textTransform: "uppercase", color: "#008000", fontFamily: "Montserrat", fontWeight: 600, marginBottom: 4 }}>Статистика</p>
         <h2 className="serif" style={{ fontSize: 24, color: "#8B0000", fontWeight: 500 }}>Аналитика</h2>
         <div style={{ width: 40, height: 2, backgroundColor: "#FF0000", marginTop: 8 }} />
       </div>

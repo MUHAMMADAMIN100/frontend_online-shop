@@ -32,7 +32,7 @@ const OrdersHistory: React.FC = () => {
 
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#008000', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 12 }}>
-            I tuoi ordini
+            Ваши заказы
           </p>
           <h1 className="serif" style={{ fontSize: 36, color: '#8B0000', letterSpacing: 4, fontWeight: 500, marginBottom: 8 }}>
             История Заказов
@@ -47,7 +47,7 @@ const OrdersHistory: React.FC = () => {
         {orders.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0', backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0' }}>
             <p className="serif" style={{ fontSize: 22, color: '#8B0000', marginBottom: 8 }}>Заказов пока нет</p>
-            <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat', letterSpacing: 2 }}>Nessun ordine ancora</p>
+            <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat', letterSpacing: 2 }}>Оформите свой первый заказ</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -55,11 +55,11 @@ const OrdersHistory: React.FC = () => {
               <div key={order.id} className="italian-card" style={{ padding: '28px 32px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, borderBottom: '1px solid #D9CFC0', paddingBottom: 16 }}>
                   <div>
-                    <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Ordine</p>
+                    <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Заказ</p>
                     <h3 className="serif" style={{ fontSize: 20, color: '#8B0000', fontWeight: 500 }}>№ {order.id}</h3>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Data</p>
+                    <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Дата</p>
                     <p style={{ fontSize: 13, color: '#555', fontFamily: 'Montserrat' }}>{new Date(order.createdAt).toLocaleDateString('ru-RU')}</p>
                   </div>
                 </div>
@@ -79,7 +79,7 @@ const OrdersHistory: React.FC = () => {
 
                 <div style={{ borderTop: '1px solid #D9CFC0', marginTop: 16, paddingTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Totale</p>
+                    <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Итого</p>
                     <p className="serif" style={{ fontSize: 24, color: '#FF0000', fontWeight: 600 }}>
                       {order.items.reduce((s, i) => s + i.quantity * i.price, 0).toLocaleString()} ₽
                     </p>

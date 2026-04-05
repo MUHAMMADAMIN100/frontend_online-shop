@@ -142,7 +142,7 @@ const ProductsManagement: React.FC = () => {
       {/* Заголовок */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
         <div>
-          <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#008000', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 4 }}>Gestione Prodotti</p>
+          <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#008000', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 4 }}>Управление товарами</p>
           <h2 className="serif" style={{ fontSize: 24, color: '#8B0000', fontWeight: 500 }}>Товары</h2>
           <div style={{ width: 40, height: 2, backgroundColor: '#FF0000', marginTop: 8 }} />
         </div>

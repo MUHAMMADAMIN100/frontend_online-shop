@@ -53,9 +53,9 @@ const AdminDashboard: React.FC = () => {
   if (loading) return <LoadingLogo height="100vh" />
 
   const navItems = [
-    { to: "/admin/users",     label: "Пользователи", it: "Utenti" },
-    { to: "/admin/products",  label: "Товары",       it: "Prodotti" },
-    { to: "/admin/analytics", label: "Аналитика",    it: "Analisi" },
+    { to: "/admin/users",     label: "Пользователи", it: "Управление" },
+    { to: "/admin/products",  label: "Товары",       it: "Каталог" },
+    { to: "/admin/analytics", label: "Аналитика",    it: "Статистика" },
   ]
 
   return (
@@ -66,7 +66,7 @@ const AdminDashboard: React.FC = () => {
           <div style={{ width: 40, height: 40, border: "1.5px solid #FFFFFF", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Playfair Display', serif", color: "#FFFFFF", fontSize: 14, fontWeight: 600 }}>DR</div>
           <div>
             <h1 className="serif" style={{ color: "#FFFFFF", fontSize: 20, letterSpacing: 4, fontWeight: 500, margin: 0 }}>DORRO</h1>
-            <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, letterSpacing: 3, textTransform: "uppercase", fontFamily: "Montserrat", margin: 0 }}>Pannello Amministratore</p>
+            <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, letterSpacing: 3, textTransform: "uppercase", fontFamily: "Montserrat", margin: 0 }}>Панель администратора</p>
           </div>
         </div>
         <button onClick={handleLogout} style={{ border: "1px solid rgba(255,255,255,0.5)", color: "#FFFFFF", padding: "8px 24px", fontFamily: "Montserrat", fontSize: 10, letterSpacing: 3, textTransform: "uppercase", cursor: "pointer", background: "transparent" }}>

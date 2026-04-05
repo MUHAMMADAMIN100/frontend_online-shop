@@ -43,7 +43,7 @@ const UsersManagement: React.FC = () => {
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#008000', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 4 }}>Gestione Utenti</p>
+        <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#008000', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 4 }}>Управление пользователями</p>
         <h2 className="serif" style={{ fontSize: 24, color: '#8B0000', fontWeight: 500 }}>Пользователи</h2>
         <div style={{ width: 40, height: 2, backgroundColor: '#FF0000', marginTop: 8 }} />
       </div>

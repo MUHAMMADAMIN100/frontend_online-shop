@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { notify } from "../utils/swal";
-import { fetchCart, addToCart, removeFromCart, clearCart } from "../features/cart/cartSlice";
+import { fetchCart, addToCart, removeFromCart, clearCart, optimisticRemove } from "../features/cart/cartSlice";
 import type { RootState } from "../app/store";
 import LoadingLogo from "../components/LoadingLogo";
 import DeliveryMap from "../components/DeliveryMap";
@@ -77,7 +77,10 @@ const Cart: React.FC = () => {
   }, [dispatch, localQty, items]);
 
   const handleDelete = useCallback((cartItemId: number, productId: number) => {
+    // Мгновенное удаление из UI
     setLocalQty(prev => { const next = { ...prev }; delete next[productId]; return next; });
+    dispatch(optimisticRemove(cartItemId));
+    // Фоновая синхронизация с сервером
     dispatch(removeFromCart(cartItemId));
   }, [dispatch]);
 
@@ -114,10 +117,10 @@ const Cart: React.FC = () => {
         setOrderCompleted(true);
         setName(""); setPhone(""); setAddress("");
       } else {
-        notify.error("Errore", "Не удалось создать заказ");
+        notify.error("Ошибка", "Не удалось создать заказ");
       }
     } catch {
-      notify.error("Errore", "Не удалось создать заказ");
+      notify.error("Ошибка", "Не удалось создать заказ");
     } finally { setOrderLoading(false); }
   };
 
@@ -129,7 +132,7 @@ const Cart: React.FC = () => {
 
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <h1 className="serif" style={{ fontSize: 36, color: '#8B0000', letterSpacing: 4, fontWeight: 500, marginBottom: 8 }}>
-            Il Carrello
+            Корзина
           </h1>
           <p style={{ fontSize: 9, letterSpacing: 4, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat' }}>Ваша корзина</p>
         </div>
@@ -137,7 +140,7 @@ const Cart: React.FC = () => {
         {items.length === 0 && !orderCompleted ? (
           <div style={{ textAlign: 'center', padding: '80px 0', backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0' }}>
             <p className="serif" style={{ fontSize: 22, color: '#8B0000', marginBottom: 8 }}>Корзина пуста</p>
-            <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat', letterSpacing: 2 }}>Il carrello è vuoto</p>
+            <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat', letterSpacing: 2 }}>Добавьте товары из каталога</p>
           </div>
         ) : (
           <>
@@ -187,7 +190,7 @@ const Cart: React.FC = () => {
 
             <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '28px 32px', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
               <div>
-                <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Totale</p>
+                <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Итого</p>
                 <p className="serif" style={{ fontSize: 28, color: '#FF0000', fontWeight: 600 }}>{totalPrice.toLocaleString()} ₽</p>
               </div>
               <div style={{ display: 'flex', gap: 12 }}>

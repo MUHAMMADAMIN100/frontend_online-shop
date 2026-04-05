@@ -90,7 +90,7 @@ export default function Navbar() {
             }}>DORRO</span>
             <div style={{ width: "100%", height: 1, backgroundColor: "#8B0000", margin: "2px 0" }} />
             <span style={{ fontSize: 6, letterSpacing: 3, color: "#8B0000", fontFamily: "Montserrat", textTransform: "uppercase" }}>
-              Italian Atelier · 1991
+              Итальянский Ателье · 1991
             </span>
           </Link>
 
