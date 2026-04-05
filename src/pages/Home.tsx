@@ -143,7 +143,7 @@ export default function Home() {
                   {product.description?.slice(0, 70)}{product.description?.length > 70 ? "..." : ""}
                 </p>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <p className="serif" style={{ fontSize: 20, color: "#FF0000", fontWeight: 600 }}>
+                  <p className="serif" style={{ fontSize: 20, color: "#008000", fontWeight: 600 }}>
                     {product.price.toLocaleString()} $
                   </p>
                   {product.stock !== undefined && product.stock <= 5 && product.stock > 0 && (

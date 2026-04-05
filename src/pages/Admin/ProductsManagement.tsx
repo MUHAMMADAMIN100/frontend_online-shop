@@ -243,7 +243,7 @@ const ProductsManagement: React.FC = () => {
                   <p style={{ fontSize: 10, color: '#888', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.description}</p>
                 </td>
                 <td style={{ padding: '12px 16px' }}>
-                  <span className="serif" style={{ fontSize: 16, color: '#FF0000', fontWeight: 600 }}>{p.price.toLocaleString()} $</span>
+                  <span className="serif" style={{ fontSize: 16, color: '#008000', fontWeight: 600 }}>{p.price.toLocaleString()} $</span>
                 </td>
                 <td style={{ padding: '12px 16px' }}>
                   <span style={{ padding: '3px 10px', backgroundColor: '#008000', color: '#FFFFFF', fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 600 }}>{p.category}</span>

@@ -226,7 +226,7 @@ function ProductDetailPanel({ product, totalRevenue, totalSold, colorIdx, onClos
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
         {[
           { label: "Продано", value: `${product.sold} шт`, color: "#8B0000" },
-          { label: "Выручка", value: `${product.revenue.toLocaleString("ru")} $`, color: "#FF0000" },
+          { label: "Выручка", value: `${product.revenue.toLocaleString("ru")} $`, color: "#008000" },
           { label: "Ср. цена", value: `${avgPrice.toLocaleString("ru")} $`, color: "#1565C0" },
           { label: "На складе", value: product.stock === 0 ? "Нет" : `${product.stock} шт`, color: product.stock === 0 ? "#FF0000" : product.stock <= 5 ? "#CC8800" : "#008000" },
           { label: "Доля выручки", value: `${revPct}%`, color },
@@ -342,7 +342,7 @@ export default function Analytics() {
         <StatCard label="Всего клиентов" value={data.totalStats.users} color="#1565C0" />
         <StatCard label="Всего товаров" value={data.totalStats.products} color="#2E7D32" />
         <StatCard label="Всего заказов" value={data.totalStats.orders} color="#8B0000" />
-        <StatCard label="Общая выручка" value={`${data.totalStats.revenue.toLocaleString("ru")} $`} color="#FF0000" />
+        <StatCard label="Общая выручка" value={`${data.totalStats.revenue.toLocaleString("ru")} $`} color="#008000" />
       </div>
 
       {/* Панель выбранного товара */}

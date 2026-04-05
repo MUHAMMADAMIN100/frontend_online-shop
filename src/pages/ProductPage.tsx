@@ -260,7 +260,7 @@ export default function ProductPage() {
             <div style={{ width: 28, height: 1, backgroundColor: "#FF0000" }} />
           </div>
 
-          <p className="serif animate-fadeInDelay2" style={{ fontSize: 36, color: "#FF0000", fontWeight: 600, marginBottom: 14 }}>
+          <p className="serif animate-fadeInDelay2" style={{ fontSize: 36, color: "#008000", fontWeight: 600, marginBottom: 14 }}>
             {product.price.toLocaleString()} $
           </p>
 
