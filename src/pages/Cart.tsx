@@ -42,33 +42,33 @@ const Cart: React.FC = () => {
     }
   }, [items, initialLoad, pendingOps]);
 
-  const handleAdd = useCallback(async (productId: number) => {
+  const handleAdd = useCallback(async (cartItemId: number, productId: number, size?: string, color?: string) => {
     // Мгновенный UI
-    setLocalQty(prev => ({ ...prev, [productId]: (prev[productId] || 1) + 1 }));
+    setLocalQty(prev => ({ ...prev, [cartItemId]: (prev[productId] || 1) + 1 }));
     pendingOpsRef.current++;
     setPendingOps(p => p + 1);
     try {
-      await dispatch(addToCart({ productId, quantity: 1 }));
+      await dispatch(addToCart({ productId, quantity: 1, size, color }));
     } finally {
       pendingOpsRef.current = Math.max(0, pendingOpsRef.current - 1);
       setPendingOps(p => Math.max(0, p - 1));
     }
   }, [dispatch]);
 
-  const handleRemove = useCallback(async (productId: number) => {
+  const handleRemove = useCallback(async (productId: number, size?: string, color?: string) => {
     const currentQty = localQty[productId] || 1;
     if (currentQty > 1) {
       setLocalQty(prev => ({ ...prev, [productId]: currentQty - 1 }));
       pendingOpsRef.current++;
       setPendingOps(p => p + 1);
       try {
-        await dispatch(addToCart({ productId, quantity: -1 }));
+        await dispatch(addToCart({ productId, quantity: -1, size, color }));
       } finally {
         pendingOpsRef.current = Math.max(0, pendingOpsRef.current - 1);
         setPendingOps(p => Math.max(0, p - 1));
       }
     } else {
-      const item = items.find(i => i.productId === productId);
+      const item = items.find(i => i.productId === productId && (i.size ?? null) === (size ?? null) && (i.color ?? null) === (color ?? null));
       if (item) {
         setLocalQty(prev => { const next = { ...prev }; delete next[productId]; return next; });
         dispatch(removeFromCart(item.id));
@@ -170,17 +170,29 @@ const Cart: React.FC = () => {
                       <div style={{ flex: 1 }}>
                         <h3 className="serif" style={{ fontSize: 16, color: '#1A1A1A', fontWeight: 500, marginBottom: 4 }}>{item.product.name}</h3>
                         <p style={{ fontSize: 14, color: '#FF0000', fontFamily: 'Montserrat', fontWeight: 600 }}>{item.product.price.toLocaleString()} ₽</p>
-                        <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat', letterSpacing: 1 }}>Кол-во: {qty}</p>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+                          {item.size && (
+                            <span style={{ fontSize: 10, fontFamily: 'Montserrat', letterSpacing: 1, color: '#555', backgroundColor: '#F7F4EF', border: '1px solid #D9CFC0', padding: '2px 8px' }}>
+                              {item.size}
+                            </span>
+                          )}
+                          {item.color && (
+                            <span style={{ fontSize: 10, fontFamily: 'Montserrat', letterSpacing: 1, color: '#555', backgroundColor: '#F7F4EF', border: '1px solid #D9CFC0', padding: '2px 8px' }}>
+                              {item.color}
+                            </span>
+                          )}
+                        </div>
+                        <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat', letterSpacing: 1, marginTop: 4 }}>Кол-во: {qty}</p>
                       </div>
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         {/* + */}
-                        <button onClick={() => handleAdd(item.productId)}
+                        <button onClick={() => handleAdd(item.id, item.productId, item.size, item.color)}
                           style={{ width: 34, height: 34, backgroundColor: '#008000', color: '#fff', border: 'none', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
                           title="Добавить">
                           +
                         </button>
                         {/* − */}
-                        <button onClick={() => handleRemove(item.productId)}
+                        <button onClick={() => handleRemove(item.productId, item.size, item.color)}
                           style={{ width: 34, height: 34, backgroundColor: '#888', color: '#fff', border: 'none', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
                           title="Убрать">
                           −

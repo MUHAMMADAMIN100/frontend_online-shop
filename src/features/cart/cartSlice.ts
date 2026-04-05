@@ -62,7 +62,7 @@ export const fetchCart = createAsyncThunk("cart/fetchCart", async (_, { getState
 
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ productId, quantity }: { productId: number; quantity: number }, { getState, rejectWithValue }) => {
+  async ({ productId, quantity, size, color }: { productId: number; quantity: number; size?: string; color?: string }, { getState, rejectWithValue }) => {
     try {
       const state = getState() as RootState
       const token = state.auth.token
@@ -73,7 +73,7 @@ export const addToCart = createAsyncThunk(
 
       const res = await axios.post(
         `${API_URL}/add`,
-        { productId, quantity },
+        { productId, quantity, size, color },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -150,6 +150,8 @@ interface CartItem {
   id: number
   productId: number
   quantity: number
+  size?: string
+  color?: string
   product: {
     id: number
     name: string
@@ -180,7 +182,10 @@ const cartSlice = createSlice({
     },
     // Мгновенно добавляет товар в Redux (до ответа сервера)
     optimisticAdd: (state, action: PayloadAction<CartItem>) => {
-      const existing = state.items.find((i) => i.productId === action.payload.productId)
+      const { productId, size, color } = action.payload
+      const existing = state.items.find(
+        (i) => i.productId === productId && (i.size ?? null) === (size ?? null) && (i.color ?? null) === (color ?? null)
+      )
       if (existing) {
         existing.quantity += action.payload.quantity
       } else {
@@ -211,7 +216,9 @@ const cartSlice = createSlice({
       .addCase(addToCart.pending, (_state) => { /* optimistic — no spinner */ })
       .addCase(addToCart.fulfilled, (state, action) => {
         const item = action.payload
-        const existing = state.items.find((i) => i.productId === item.productId)
+        const existing = state.items.find(
+          (i) => i.productId === item.productId && (i.size ?? null) === (item.size ?? null) && (i.color ?? null) === (item.color ?? null)
+        )
         if (existing) {
           existing.id = item.id       // заменяем temp id на реальный
           existing.quantity = item.quantity

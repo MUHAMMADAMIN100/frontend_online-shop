@@ -113,26 +113,36 @@ export default function ProductPage() {
       notify.warning("Выберите размер", "Пожалуйста, выберите размер перед добавлением");
       return;
     }
-    const alreadyInCart = cartItems.some(item => item.productId === product!.id);
+
+    const colorName = selectedColor?.name;
+    // Уже в корзине — проверяем по productId + size + color
+    const alreadyInCart = cartItems.some(
+      item => item.productId === product!.id
+        && (item.size ?? null) === (selectedSize ?? null)
+        && (item.color ?? null) === (colorName ?? null)
+    );
     if (alreadyInCart) {
-      notify.warning("Уже в корзине", "Этот товар уже добавлен в корзину. Измените количество в корзине.");
+      notify.warning("Уже в корзине", "Этот товар с таким размером и цветом уже в корзине");
       return;
     }
 
+    const tempId = -(product!.id * 1000 + Date.now() % 1000);
     // Мгновенное обновление UI
     dispatch(optimisticAdd({
-      id: -(product!.id),
+      id: tempId,
       productId: product!.id,
       quantity: 1,
+      size: selectedSize ?? undefined,
+      color: colorName ?? undefined,
       product: { id: product!.id, name: product!.name, description: product!.description || '', price: product!.price, image: product!.image }
     }));
     notify.addedToCart();
     setAddingToCart(true);
 
     // Фоновая синхронизация
-    dispatch(addToCart({ productId: product!.id, quantity: 1 }))
+    dispatch(addToCart({ productId: product!.id, quantity: 1, size: selectedSize ?? undefined, color: colorName ?? undefined }))
       .catch(() => {
-        dispatch(optimisticRemove(-(product!.id)));
+        dispatch(optimisticRemove(tempId));
         notify.error("Ошибка", "Не удалось добавить товар");
       })
       .finally(() => setTimeout(() => setAddingToCart(false), 400));
