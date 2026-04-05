@@ -47,10 +47,6 @@ export default function Analytics() {
     ? Math.round(((data.thisMonth.orders - data.lastMonth.orders) / data.lastMonth.orders) * 100)
     : null;
 
-  const growthStyle = (v: number | null) => ({
-    color: v === null ? "#888" : v >= 0 ? "#008000" : "#FF0000"
-  });
-
   return (
     <div>
       <div style={{ marginBottom: 28 }}>
