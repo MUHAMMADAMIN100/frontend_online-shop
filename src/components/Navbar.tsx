@@ -324,7 +324,7 @@ export default function Navbar() {
               />
               <select
                 value={searchParams.get("category") || ""}
-                onChange={e => updateFilter("category", e.target.value)}
+                onChange={e => { updateFilter("category", e.target.value); if (e.target.value) setMobileOpen(false); }}
               >
                 <option value="">Все категории</option>
                 <option value="Кроссовки">Кроссовки</option>

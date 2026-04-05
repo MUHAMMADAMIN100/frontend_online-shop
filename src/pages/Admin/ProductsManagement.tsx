@@ -154,8 +154,8 @@ const ProductsManagement: React.FC = () => {
       </div>
 
       {/* Фильтры */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 180 }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ position: 'relative', flex: '1 1 160px', minWidth: 0 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2"
             style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}>
             <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
@@ -172,7 +172,7 @@ const ProductsManagement: React.FC = () => {
         <select
           value={filterCategory}
           onChange={e => setFilterCategory(e.target.value)}
-          style={{ ...inputStyle, width: 'auto', minWidth: 160, cursor: 'pointer' }}
+          style={{ ...inputStyle, flex: '0 1 160px', minWidth: 120, cursor: 'pointer' }}
         >
           <option value="">Все категории</option>
           {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
