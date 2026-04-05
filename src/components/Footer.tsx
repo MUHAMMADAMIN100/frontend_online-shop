@@ -8,7 +8,7 @@ export default function Footer() {
       {/* Итальянская полоска */}
       <div style={{ height: 4, background: "linear-gradient(to right, #008000 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #FF0000 66.66%)" }} />
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "56px 40px 32px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 40 }}>
+      <div className="footer-grid">
 
         {/* Логотип и описание */}
         <div>
@@ -104,7 +104,7 @@ export default function Footer() {
       </div>
 
       {/* Нижняя полоса */}
-      <div style={{ borderTop: "1px solid #2D2D2D", padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+      <div className="footer-bottom">
         <p style={{ fontSize: 10, color: "#555", margin: 0, letterSpacing: 1 }}>
           © {year} DORRO. Все права защищены.
         </p>

@@ -61,7 +61,7 @@ const AdminDashboard: React.FC = () => {
   return (
     <div style={{ backgroundColor: "#F7F4EF", minHeight: "100vh" }}>
       {/* Admin Header */}
-      <div style={{ backgroundColor: "#8B0000", padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ backgroundColor: "#8B0000", padding: "clamp(14px,3vw,20px) clamp(16px,4vw,40px)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <div style={{ width: 40, height: 40, border: "1.5px solid #FFFFFF", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Playfair Display', serif", color: "#FFFFFF", fontSize: 14, fontWeight: 600 }}>DR</div>
           <div>
@@ -76,9 +76,9 @@ const AdminDashboard: React.FC = () => {
 
       <div className="tricolor" />
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px" }}>
+      <div className="admin-wrapper">
         {/* Навигация */}
-        <nav style={{ display: "flex", gap: 2, marginBottom: 32, flexWrap: "wrap" }}>
+        <nav className="admin-nav">
           {navItems.map(item => (
             <NavItem
               key={item.to}
@@ -91,7 +91,7 @@ const AdminDashboard: React.FC = () => {
         </nav>
 
         {/* Контент */}
-        <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #D9CFC0", padding: "32px" }}>
+        <div className="admin-content">
           <Routes>
             <Route path="/users"     element={<UsersManagement />} />
             <Route path="/products"  element={<ProductsManagement />} />

@@ -27,7 +27,7 @@ const OrdersHistory: React.FC = () => {
   );
 
   return (
-    <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh', padding: '60px 40px' }}>
+    <div className="page-wrapper">
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -53,7 +53,7 @@ const OrdersHistory: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {orders.map(order => (
               <div key={order.id} className="italian-card" style={{ padding: '28px 32px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, borderBottom: '1px solid #D9CFC0', paddingBottom: 16 }}>
+                <div className="order-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, borderBottom: '1px solid #D9CFC0', paddingBottom: 16 }}>
                   <div>
                     <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Заказ</p>
                     <h3 className="serif" style={{ fontSize: 20, color: '#8B0000', fontWeight: 500 }}>№ {order.id}</h3>
@@ -66,7 +66,7 @@ const OrdersHistory: React.FC = () => {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {order.items.map(item => (
-                    <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div key={item.id} className="order-item-row" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                       <img src={item.product.image || "https://via.placeholder.com/60"} alt={item.product.name} style={{ width: 60, height: 60, objectFit: 'cover' }} />
                       <div style={{ flex: 1 }}>
                         <p className="serif" style={{ fontSize: 15, color: '#1A1A1A', fontWeight: 500 }}>{item.product.name}</p>

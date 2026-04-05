@@ -127,7 +127,7 @@ const Cart: React.FC = () => {
   if (initialLoad) return <LoadingLogo height="50vh" />;
 
   return (
-    <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh', padding: '60px 40px' }}>
+    <div className="page-wrapper">
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -149,7 +149,7 @@ const Cart: React.FC = () => {
                 {items.map((item) => {
                   const qty = localQty[item.productId] ?? item.quantity;
                   return (
-                    <div key={item.id} className="italian-card" style={{ display: 'flex', alignItems: 'center', gap: 24, padding: '20px 28px' }}>
+                    <div key={item.id} className="italian-card cart-item" style={{ display: 'flex', alignItems: 'center', gap: 24, padding: '20px 28px' }}>
                       <img src={item.product.image || "https://placehold.co/80x80"} alt={item.product.name}
                         style={{ width: 80, height: 80, objectFit: 'cover' }} />
                       <div style={{ flex: 1 }}>
@@ -188,12 +188,12 @@ const Cart: React.FC = () => {
               </div>
             )}
 
-            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '28px 32px', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+            <div className="cart-footer" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '28px 32px', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
               <div>
                 <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Итого</p>
                 <p className="serif" style={{ fontSize: 28, color: '#FF0000', fontWeight: 600 }}>{totalPrice.toLocaleString()} ₽</p>
               </div>
-              <div style={{ display: 'flex', gap: 12 }}>
+              <div className="cart-footer-buttons" style={{ display: 'flex', gap: 12 }}>
                 <button onClick={handleClear} className="btn-secondary">Очистить</button>
                 <button onClick={() => setShowCheckout(true)} className="btn-primary">Оформить заказ</button>
               </div>
@@ -211,7 +211,7 @@ const Cart: React.FC = () => {
       {/* ══ Модальное окно оформления заказа ══ */}
       {showCheckout && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '16px' }}>
-          <div className="animate-scaleUp" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '32px 28px', width: '100%', maxWidth: 480, maxHeight: '92vh', overflowY: 'auto' }}>
+          <div className="animate-scaleUp checkout-modal scroll-touch" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '32px 28px', width: '100%', maxWidth: 480, maxHeight: '92vh', overflowY: 'auto' }}>
 
             {/* Заголовок */}
             <div style={{ textAlign: 'center', marginBottom: 22 }}>
@@ -226,7 +226,7 @@ const Cart: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
               {/* Имя + телефон в ряд */}
-              <div style={{ display: 'flex', gap: 10 }}>
+              <div className="checkout-name-phone" style={{ display: 'flex', gap: 10 }}>
                 <input
                   placeholder="Имя"
                   value={name}

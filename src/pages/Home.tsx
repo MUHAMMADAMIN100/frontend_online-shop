@@ -69,7 +69,7 @@ export default function Home() {
   if (loading) return <LoadingLogo height="80vh" />;
 
   return (
-    <div style={{ backgroundColor: "#F7F4EF", minHeight: "100vh", padding: "60px 40px" }}>
+    <div className="page-wrapper">
 
       {/* Заголовок */}
       <div className="animate-slideInUp" style={{ textAlign: "center", marginBottom: 60 }}>
@@ -95,7 +95,7 @@ export default function Home() {
       </div>
 
       {/* Сетка товаров */}
-      <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 28 }}>
+      <div className="product-grid">
         {filtered.map(product => (
           <div key={product.id} className="italian-card card-stagger" style={{ display: "flex", flexDirection: "column" }}>
             <Link to={`/product/${product.id}`} style={{ textDecoration: "none", display: "block" }}>

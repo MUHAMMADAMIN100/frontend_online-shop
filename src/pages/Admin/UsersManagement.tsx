@@ -48,7 +48,7 @@ const UsersManagement: React.FC = () => {
         <div style={{ width: 40, height: 2, backgroundColor: '#FF0000', marginTop: 8 }} />
       </div>
 
-      <div style={{ overflowX: 'auto' }}>
+      <div className="table-scroll scroll-x-touch">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Montserrat' }}>
           <thead>
             <tr style={{ backgroundColor: '#F7F4EF', borderBottom: '2px solid #D9CFC0' }}>

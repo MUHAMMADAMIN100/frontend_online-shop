@@ -147,11 +147,11 @@ export default function ProductPage() {
   const stock = stockInfo();
 
   return (
-    <div style={{ backgroundColor: "#F7F4EF", minHeight: "100vh", padding: "48px 24px" }}>
+    <div className="page-wrapper">
       <div className="animate-slideInUp" style={{ maxWidth: 1100, margin: "0 auto", backgroundColor: "#FFFFFF", border: "1px solid #D9CFC0", display: "flex", flexWrap: "wrap" }}>
 
         {/* ═══ ЛЕВАЯ ЧАСТЬ: галерея ═══ */}
-        <div style={{ flex: "1 1 420px", display: "flex" }}>
+        <div style={{ flex: "1 1 300px", minWidth: 0, display: "flex" }}>
 
           {/* Тумбы (вертикальные) */}
           {gallery.length > 1 && (
@@ -210,7 +210,7 @@ export default function ProductPage() {
         </div>
 
         {/* ═══ ПРАВАЯ ЧАСТЬ: детали ═══ */}
-        <div style={{ flex: "1 1 340px", padding: "44px 44px", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+        <div style={{ flex: "1 1 300px", minWidth: 0, padding: "clamp(20px, 4vw, 44px)", display: "flex", flexDirection: "column" }}>
 
           {product.category && (
             <p className="animate-fadeInDelay1" style={{ fontSize: 9, letterSpacing: 4, textTransform: "uppercase", color: "#008000", fontFamily: "Montserrat", fontWeight: 600, marginBottom: 10 }}>

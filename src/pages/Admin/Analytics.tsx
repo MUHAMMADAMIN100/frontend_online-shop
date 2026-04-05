@@ -211,7 +211,7 @@ export default function Analytics() {
       </div>
 
       {/* Сравнение месяцев */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+      <div className="charts-grid">
         <ChartCard title="Выручка: этот vs прошлый месяц" subtitle="Сравнение">
           <BarChart
             data={monthCompare}
@@ -236,7 +236,7 @@ export default function Analytics() {
       </div>
 
       {/* Графики по продуктам */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+      <div className="charts-grid">
         <ChartCard title="Продано единиц (топ товары)" subtitle="Продажи">
           <BarChart
             data={data.topProducts}
@@ -259,7 +259,7 @@ export default function Analytics() {
       </div>
 
       {/* Пирог + остатки */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+      <div className="charts-grid">
         <ChartCard title="Доля выручки по товарам" subtitle="Распределение">
           <DonutChart data={data.topProducts} valueKey="revenue" labelKey="name" />
         </ChartCard>
