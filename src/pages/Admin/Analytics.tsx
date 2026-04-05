@@ -173,7 +173,6 @@ export default function Analytics() {
     : null;
 
   const maxSold = Math.max(...data.topProducts.map(p => p.sold), 1);
-  const maxStock = Math.max(...data.topProducts.map(p => p.stock ?? 0), 1);
 
   // Сравнение месяцев для мини-диаграммы
   const monthCompare = [
