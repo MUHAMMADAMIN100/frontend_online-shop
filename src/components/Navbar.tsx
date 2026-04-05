@@ -17,6 +17,7 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null);
 
   const isHome = location.pathname === "/";
+  const isAdmin = location.pathname.startsWith("/admin");
   const totalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const user = parseJwt(token);
 
@@ -139,7 +140,7 @@ export default function Navbar() {
           <div style={{ display: "flex", alignItems: "center", gap: 18, flexShrink: 0 }}>
 
             {/* Cart — green icon */}
-            <Link
+            {!isAdmin && <Link
               to="/cart"
               style={{
                 position: "relative", textDecoration: "none",
@@ -168,12 +169,12 @@ export default function Navbar() {
                   {totalCount}
                 </span>
               )}
-            </Link>
+            </Link>}
 
-            <div style={{ width: 1, height: 36, backgroundColor: "#D9CFC0" }} />
+            {!isAdmin && <div style={{ width: 1, height: 36, backgroundColor: "#D9CFC0" }} />}
 
             {/* Auth section */}
-            {token ? (
+            {!isAdmin && (token ? (
               /* ── Profile icon + dropdown ── */
               <div ref={profileRef} style={{ position: "relative" }}>
                 <button
@@ -337,7 +338,7 @@ export default function Navbar() {
                 </Link>
 
               </div>
-            )}
+            ))}
           </div>
         </div>
       </nav>

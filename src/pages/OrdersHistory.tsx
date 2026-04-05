@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
+import LoadingLogo from "../components/LoadingLogo";
 
 interface OrderItem { id: number; product: { id: number; name: string; price: number; image?: string }; quantity: number; price: number; }
 interface Order { id: number; createdAt: string; items: OrderItem[]; }
@@ -21,7 +22,7 @@ const OrdersHistory: React.FC = () => {
 
   if (loading) return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-      <p className="serif" style={{ color: '#8B0000', fontSize: 18, letterSpacing: 3 }}>Caricamento...</p>
+      <LoadingLogo height="60vh" />
     </div>
   );
 

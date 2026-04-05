@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import ProductPage from "./pages/ProductPage";
 import Cart from "./pages/Cart";
@@ -20,6 +20,8 @@ export default function App() {
   const dispatch = useDispatch<AppDispatch>();
   const token = useSelector((state: RootState) => state.auth.token);
   const cartError = useSelector((state: RootState) => state.cart.error);
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
 
   // Синхронизация авторизации
   useEffect(() => {
@@ -60,7 +62,7 @@ export default function App() {
 
   return (
     <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar />
+      {!isAdmin && <Navbar />}
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -80,7 +82,7 @@ export default function App() {
           />
         </Routes>
       </main>
-      <Footer />
+      {!isAdmin && <Footer />}
     </div>
   );
 }

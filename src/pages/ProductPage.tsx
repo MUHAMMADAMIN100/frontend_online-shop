@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { notify } from "../utils/swal";
 import type { AppDispatch, RootState } from "../app/store";
 import { addToCart } from "../features/cart/cartSlice";
+import LoadingLogo from "../components/LoadingLogo";
 
 interface ColorVariant {
   name: string;
@@ -58,8 +59,9 @@ export default function ProductPage() {
   const [imgFading, setImgFading]         = useState(false);
   const [addingToCart, setAddingToCart]   = useState(false);
 
-  const dispatch = useDispatch<AppDispatch>();
-  const token    = useSelector((state: RootState) => state.auth.token);
+  const dispatch   = useDispatch<AppDispatch>();
+  const token      = useSelector((state: RootState) => state.auth.token);
+  const cartItems  = useSelector((state: RootState) => state.cart.items);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -96,6 +98,11 @@ export default function ProductPage() {
       notify.warning("Выберите размер", "Пожалуйста, выберите размер перед добавлением");
       return;
     }
+    const alreadyInCart = cartItems.some(item => item.productId === product!.id);
+    if (alreadyInCart) {
+      notify.warning("Уже в корзине", "Этот товар уже добавлен в корзину. Измените количество в корзине.");
+      return;
+    }
     setAddingToCart(true);
     try {
       await dispatch(addToCart({ productId: product!.id, quantity: 1 })).unwrap();
@@ -124,7 +131,7 @@ export default function ProductPage() {
   if (!product) return (
     <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "60vh", gap: 16 }}>
       <div className="loader-ring" />
-      <p className="serif" style={{ color: "#8B0000", fontSize: 14, letterSpacing: 3 }}>Caricamento...</p>
+      <LoadingLogo height="60vh" />
     </div>
   );
 

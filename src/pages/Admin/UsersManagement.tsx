@@ -2,6 +2,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../app/store"
+import LoadingLogo from "../../components/LoadingLogo"
 
 interface User { id: number; email: string; role: string; createdAt: string; }
 
@@ -37,7 +38,7 @@ const UsersManagement: React.FC = () => {
     } catch { alert("Ошибка") }
   }
 
-  if (loading) return <p className="serif" style={{ color: '#8B0000', textAlign: 'center', padding: 40, letterSpacing: 2 }}>Caricamento...</p>
+  if (loading) return <LoadingLogo height="300px" />
 
   return (
     <div>

@@ -11,8 +11,9 @@ export default function Home() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
-  const dispatch = useDispatch<AppDispatch>();
-  const token = useSelector((state: RootState) => state.auth.token);
+  const dispatch   = useDispatch<AppDispatch>();
+  const token      = useSelector((state: RootState) => state.auth.token);
+  const cartItems  = useSelector((state: RootState) => state.cart.items);
 
   const search   = searchParams.get("search")   || "";
   const category = searchParams.get("category") || "";
@@ -39,6 +40,11 @@ export default function Home() {
   const handleAdd = async (productId: number) => {
     if (!token) {
       notify.warning("Войдите в аккаунт", "Для добавления товара необходима авторизация");
+      return;
+    }
+    const alreadyInCart = cartItems.some(item => item.productId === productId);
+    if (alreadyInCart) {
+      notify.warning("Уже в корзине", "Этот товар уже добавлен в корзину. Измените количество в корзине.");
       return;
     }
     try {
