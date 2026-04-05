@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import LoadingLogo from "../../components/LoadingLogo";
@@ -35,6 +35,7 @@ const ProductsManagement: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Поля формы
   const [name, setName] = useState("");
@@ -260,82 +261,101 @@ const ProductsManagement: React.FC = () => {
 
       {/* Форма добавления/редактирования */}
       {showForm && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 20 }}>
-          <div className="animate-scaleUp" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '40px', width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto' }}>
-            <h3 className="serif" style={{ fontSize: 20, color: '#8B0000', letterSpacing: 2, marginBottom: 24, textAlign: 'center' }}>
-              {editingId ? "Редактировать товар" : "Добавить товар"}
-            </h3>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <input placeholder="Название" value={name} onChange={e => setName(e.target.value)} required style={inputStyle}
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16 }}>
+          <div className="animate-scaleUp" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', width: '100%', maxWidth: 680, maxHeight: '92vh', display: 'flex', flexDirection: 'column' }}>
+
+            {/* Шапка — фиксированная */}
+            <div style={{ padding: '18px 24px 14px', borderBottom: '1px solid #D9CFC0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+              <h3 className="serif" style={{ fontSize: 18, color: '#8B0000', letterSpacing: 2, margin: 0 }}>
+                {editingId ? "Редактировать товар" : "Добавить товар"}
+              </h3>
+              <button onClick={() => { setShowForm(false); resetForm(); }}
+                style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#888', padding: 4 }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+
+            {/* Тело формы — прокручиваемое */}
+            <form ref={formRef} onSubmit={handleSubmit} style={{ overflowY: 'auto', flex: 1, padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+
+              {/* Название */}
+              <input placeholder="Название товара" value={name} onChange={e => setName(e.target.value)} required style={inputStyle}
                 onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
 
-              <div style={{ display: 'flex', gap: 12 }}>
-                <input type="number" placeholder="Цена (₽)" value={price} onChange={e => setPrice(e.target.value)} required style={{ ...inputStyle, flex: 1 }}
+              {/* Цена + Склад + Категория в ряд */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                <input type="number" placeholder="Цена (₽)" value={price} onChange={e => setPrice(e.target.value)} required style={inputStyle}
                   onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
-                <input type="number" placeholder="Остаток (шт)" value={stock} onChange={e => setStock(e.target.value)} min={0} style={{ ...inputStyle, flex: 1 }}
+                <input type="number" placeholder="Остаток" value={stock} onChange={e => setStock(e.target.value)} min={0} style={inputStyle}
+                  onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
+                <select value={category} onChange={e => setCategory(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                  <option value="">Категория</option>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+
+              {/* URL фото + Размеры в ряд */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <input placeholder="URL главного фото" value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={inputStyle}
+                  onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
+                <input placeholder="Размеры: XS, S, M или 36, 37" value={sizes} onChange={e => setSizes(e.target.value)} style={inputStyle}
                   onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
               </div>
 
-              <textarea placeholder="Описание" value={description} onChange={e => setDescription(e.target.value)} style={{ ...inputStyle, resize: 'vertical', minHeight: 80 }}
-                onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
-
-              <input placeholder="URL главного изображения" value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={inputStyle}
-                onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
-
-              <select value={category} onChange={e => setCategory(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                <option value="">Выберите категорию</option>
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-
-              <input placeholder="Размеры (через запятую: XS, S, M или 36, 37, 38)" value={sizes} onChange={e => setSizes(e.target.value)} style={inputStyle}
+              {/* Описание — компактное */}
+              <textarea placeholder="Описание" value={description} onChange={e => setDescription(e.target.value)}
+                style={{ ...inputStyle, resize: 'none', height: 60 }}
                 onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
 
               {/* Цвета */}
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <span style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#555', fontFamily: 'Montserrat', fontWeight: 600 }}>Цвета и фото</span>
                   <button type="button" onClick={addColor}
-                    style={{ border: '1px solid #008000', color: '#008000', padding: '5px 14px', fontFamily: 'Montserrat', fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', background: 'transparent' }}>
-                    + Добавить цвет
+                    style={{ border: '1px solid #008000', color: '#008000', padding: '4px 12px', fontFamily: 'Montserrat', fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', cursor: 'pointer', background: 'transparent' }}>
+                    + Цвет
                   </button>
                 </div>
                 {colors.map((color, ci) => (
-                  <div key={ci} style={{ border: '1px solid #D9CFC0', padding: 16, marginBottom: 10, backgroundColor: '#FAFAF8' }}>
-                    <div style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-end' }}>
+                  <div key={ci} style={{ border: '1px solid #D9CFC0', padding: '10px 12px', marginBottom: 8, backgroundColor: '#FAFAF8' }}>
+                    {/* Строка: название + color picker + hex + удалить */}
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
                       <input value={color.name} onChange={e => updateColor(ci, 'name', e.target.value)}
-                        placeholder="Название цвета" style={{ ...inputStyle, flex: 1 }}
+                        placeholder="Название" style={{ ...inputStyle, flex: 1, padding: '7px 10px', fontSize: 12 }}
                         onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
                       <input type="color" value={color.hex} onChange={e => updateColor(ci, 'hex', e.target.value)}
-                        style={{ width: 40, height: 38, padding: 2, border: '1px solid #D9CFC0', cursor: 'pointer' }} />
+                        style={{ width: 34, height: 34, padding: 2, border: '1px solid #D9CFC0', cursor: 'pointer', flexShrink: 0 }} />
                       <input value={color.hex} onChange={e => updateColor(ci, 'hex', e.target.value)}
-                        style={{ ...inputStyle, width: 90 }} placeholder="#FF0000"
+                        style={{ ...inputStyle, width: 82, padding: '7px 8px', fontSize: 12 }} placeholder="#000000"
                         onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
                       <button type="button" onClick={() => removeColor(ci)}
-                        style={{ border: 'none', background: 'none', color: '#FF0000', cursor: 'pointer', padding: '0 4px' }}>
+                        style={{ border: 'none', background: 'none', color: '#FF0000', cursor: 'pointer', padding: 2, flexShrink: 0 }}>
                         <TrashIcon />
                       </button>
                     </div>
+                    {/* Фотографии */}
                     {color.images.map((img, ii) => (
-                      <div key={ii} style={{ display: 'flex', gap: 8, marginBottom: 6, alignItems: 'center' }}>
+                      <div key={ii} style={{ display: 'flex', gap: 6, marginBottom: 5, alignItems: 'center' }}>
                         <input value={img} onChange={e => updateColorImage(ci, ii, e.target.value)}
-                          placeholder="URL фотографии" style={{ ...inputStyle, flex: 1 }}
+                          placeholder="URL фото" style={{ ...inputStyle, flex: 1, padding: '6px 10px', fontSize: 11 }}
                           onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
-                        {img && <img src={img} alt="" style={{ width: 38, height: 38, objectFit: 'cover', border: '1px solid #D9CFC0' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />}
+                        {img && <img src={img} alt="" style={{ width: 32, height: 32, objectFit: 'cover', border: '1px solid #D9CFC0', flexShrink: 0 }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />}
                         {color.images.length > 1 && (
-                          <button type="button" onClick={() => removeColorImage(ci, ii)} style={{ border: 'none', background: 'none', color: '#888', cursor: 'pointer' }}>✕</button>
+                          <button type="button" onClick={() => removeColorImage(ci, ii)} style={{ border: 'none', background: 'none', color: '#aaa', cursor: 'pointer', padding: 2, flexShrink: 0, fontSize: 14 }}>✕</button>
                         )}
                       </div>
                     ))}
-                    <button type="button" onClick={() => addColorImage(ci)} style={{ fontSize: 10, letterSpacing: 1, color: '#888', fontFamily: 'Montserrat', background: 'none', border: 'none', cursor: 'pointer' }}>+ ещё фото</button>
+                    <button type="button" onClick={() => addColorImage(ci)} style={{ fontSize: 10, color: '#888', fontFamily: 'Montserrat', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>+ фото</button>
                   </div>
                 ))}
               </div>
-
-              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                <button type="submit" className="btn-green" style={{ flex: 1, textAlign: 'center' }}>Сохранить</button>
-                <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="btn-secondary" style={{ flex: 1, textAlign: 'center' }}>Отмена</button>
-              </div>
             </form>
+
+            {/* Футер формы — фиксированный */}
+            <div style={{ padding: '12px 24px', borderTop: '1px solid #D9CFC0', display: 'flex', gap: 10, flexShrink: 0 }}>
+              <button type="button" onClick={() => formRef.current?.requestSubmit()} className="btn-green" style={{ flex: 2, textAlign: 'center' }}>Сохранить</button>
+              <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="btn-secondary" style={{ flex: 1, textAlign: 'center' }}>Отмена</button>
+            </div>
           </div>
         </div>
       )}
