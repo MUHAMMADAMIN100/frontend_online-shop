@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import LoadingLogo from "../../components/LoadingLogo";
