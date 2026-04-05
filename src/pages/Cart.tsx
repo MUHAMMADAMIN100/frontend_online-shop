@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { notify } from "../utils/swal";
 import { fetchCart, addToCart, removeFromCart, clearCart, optimisticRemove } from "../features/cart/cartSlice";
 import type { RootState } from "../app/store";
@@ -136,6 +136,14 @@ const Cart: React.FC = () => {
   return (
     <div className="page-wrapper">
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
+
+        {/* ← Главное меню */}
+        <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#555", fontFamily: "Montserrat", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", marginBottom: 24, transition: "color 0.2s" }}
+          onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "#8B0000"}
+          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "#555"}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Главное меню
+        </Link>
 
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <h1 className="serif" style={{ fontSize: 36, color: '#8B0000', letterSpacing: 4, fontWeight: 500, marginBottom: 8 }}>

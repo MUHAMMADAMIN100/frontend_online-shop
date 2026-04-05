@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
@@ -163,6 +163,13 @@ export default function ProductPage() {
 
   return (
     <div className="page-wrapper">
+      {/* ← Главное меню */}
+      <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#555", fontFamily: "Montserrat", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", marginBottom: 20, transition: "color 0.2s" }}
+        onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "#8B0000"}
+        onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "#555"}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Главное меню
+      </Link>
       <div className="animate-slideInUp" style={{ maxWidth: 1100, margin: "0 auto", backgroundColor: "#FFFFFF", border: "1px solid #D9CFC0", display: "flex", flexWrap: "wrap" }}>
 
         {/* ═══ ЛЕВАЯ ЧАСТЬ: галерея ═══ */}
