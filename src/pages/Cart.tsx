@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { notify } from "../utils/swal";
-import { fetchCart, addToCart, removeFromCart, clearCart, optimisticRemove } from "../features/cart/cartSlice";
+import { fetchCart, addToCart, removeFromCart, clearCart, optimisticRemove, localClearCart } from "../features/cart/cartSlice";
 import type { RootState } from "../app/store";
 import LoadingLogo from "../components/LoadingLogo";
 import DeliveryMap from "../components/DeliveryMap";
@@ -108,7 +108,7 @@ const Cart: React.FC = () => {
     setShowCheckout(false);
     setShowMap(false);
     setLocalQty({});
-    dispatch(clearCart());
+    dispatch(localClearCart());
     setOrderCompleted(true);
     setName(""); setPhone(""); setAddress("");
     cacheInvalidate("orders"); // сбрасываем кэш истории заказов

@@ -196,6 +196,10 @@ const cartSlice = createSlice({
     optimisticRemove: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter((i) => i.id !== action.payload)
     },
+    // Очищает корзину только в Redux (без запроса к серверу)
+    localClearCart: (state) => {
+      state.items = []
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -254,5 +258,5 @@ const cartSlice = createSlice({
   },
 })
 
-export const { clearError, optimisticAdd, optimisticRemove } = cartSlice.actions
+export const { clearError, optimisticAdd, optimisticRemove, localClearCart } = cartSlice.actions
 export default cartSlice.reducer
