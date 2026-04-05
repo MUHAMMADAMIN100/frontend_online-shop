@@ -6,10 +6,13 @@ import { notify } from "../utils/swal";
 import type { AppDispatch, RootState } from "../app/store";
 import { addToCart, optimisticAdd, optimisticRemove } from "../features/cart/cartSlice";
 import LoadingLogo from "../components/LoadingLogo";
+import { cacheGet, cacheSet } from "../utils/cache";
+
+const PRODUCTS_CACHE = "products";
 
 export default function Home() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<any[]>(() => cacheGet<any[]>(PRODUCTS_CACHE) ?? []);
+  const [loading, setLoading] = useState(() => !cacheGet(PRODUCTS_CACHE));
   const [searchParams] = useSearchParams();
   const dispatch   = useDispatch<AppDispatch>();
   const token      = useSelector((state: RootState) => state.auth.token);
@@ -21,11 +24,11 @@ export default function Home() {
   const maxPrice = searchParams.get("maxPrice") || "";
 
   useEffect(() => {
-    setLoading(true);
+    // Всегда обновляем в фоне — если кэш есть, загрузка уже false
     axios
       .get(`${import.meta.env.VITE_API_URL}/products`)
-      .then(res => setProducts(res.data))
-      .catch(err => console.error(err))
+      .then(res => { setProducts(res.data); cacheSet(PRODUCTS_CACHE, res.data); })
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 

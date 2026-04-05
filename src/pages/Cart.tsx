@@ -6,6 +6,7 @@ import { fetchCart, addToCart, removeFromCart, clearCart, optimisticRemove } fro
 import type { RootState } from "../app/store";
 import LoadingLogo from "../components/LoadingLogo";
 import DeliveryMap from "../components/DeliveryMap";
+import { cacheInvalidate } from "../utils/cache";
 
 const Cart: React.FC = () => {
   const dispatch = useDispatch<any>();
@@ -21,7 +22,6 @@ const Cart: React.FC = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [orderLoading, setOrderLoading] = useState(false);
 
   // Счётчик активных запросов — пока > 0, не синхронизируем localQty с Redux
   const [pendingOps, setPendingOps] = useState(0);
@@ -99,29 +99,36 @@ const Cart: React.FC = () => {
       notify.warning("Заполните все поля", "Имя, телефон и адрес обязательны");
       return;
     }
-    setOrderLoading(true);
+
+    // Захватываем данные до очистки
+    const orderItems = items.map(i => ({ productId: i.productId, quantity: localQty[i.productId] ?? i.quantity }));
+    const [orderName, orderPhone, orderAddress] = [name, phone, address];
+
+    // Мгновенно обновляем UI — не ждём сервер
+    setShowCheckout(false);
+    setShowMap(false);
+    setLocalQty({});
+    dispatch(clearCart());
+    setOrderCompleted(true);
+    setName(""); setPhone(""); setAddress("");
+    cacheInvalidate("orders"); // сбрасываем кэш истории заказов
+    notify.success("Заказ оформлен!", "Ваш заказ успешно принят");
+
+    // Запрос идёт в фоне
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          customerName: name, phone, address,
-          items: items.map(i => ({ productId: i.productId, quantity: localQty[i.productId] ?? i.quantity }))
-        }),
+        body: JSON.stringify({ customerName: orderName, phone: orderPhone, address: orderAddress, items: orderItems }),
       });
-      if (response.ok) {
-        setShowCheckout(false);
-        await notify.orderCreated();
-        setLocalQty({});
-        dispatch(clearCart());
-        setOrderCompleted(true);
-        setName(""); setPhone(""); setAddress("");
-      } else {
-        notify.error("Ошибка", "Не удалось создать заказ");
+      if (!response.ok) {
+        notify.error("Ошибка заказа", "Заказ не был создан — попробуйте снова");
+        setOrderCompleted(false);
       }
     } catch {
-      notify.error("Ошибка", "Не удалось создать заказ");
-    } finally { setOrderLoading(false); }
+      notify.error("Ошибка соединения", "Проверьте интернет и попробуйте снова");
+      setOrderCompleted(false);
+    }
   };
 
   if (initialLoad) return <LoadingLogo height="50vh" />;
@@ -284,11 +291,10 @@ const Cart: React.FC = () => {
               <div style={{ display: 'flex', gap: 10 }}>
                 <button
                   onClick={handleCheckout}
-                  disabled={orderLoading}
                   className="btn-primary"
-                  style={{ flex: 2, textAlign: 'center', opacity: orderLoading ? 0.7 : 1 }}
+                  style={{ flex: 2, textAlign: 'center' }}
                 >
-                  {orderLoading ? "Оформляем..." : "Создать заказ"}
+                  Создать заказ
                 </button>
                 <button onClick={() => { setShowCheckout(false); setShowMap(false); }} className="btn-secondary" style={{ flex: 1, textAlign: 'center' }}>
                   Отмена

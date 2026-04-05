@@ -3,39 +3,46 @@ import { useState, useEffect } from "react"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../app/store"
 import LoadingLogo from "../../components/LoadingLogo"
+import { cacheGet, cacheSet } from "../../utils/cache"
 
 interface User { id: number; email: string; role: string; createdAt: string; }
 
+const CACHE_KEY = "admin-users";
+
 const UsersManagement: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.auth)
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState<User[]>(() => cacheGet<User[]>(CACHE_KEY) ?? [])
+  const [loading, setLoading] = useState(() => !cacheGet(CACHE_KEY))
 
   useEffect(() => { fetchUsers() }, [])
 
   const fetchUsers = async () => {
     try {
       const r = await fetch(`${import.meta.env.VITE_API_URL}/admin/users`, { headers: { Authorization: `Bearer ${token}` } })
-      if (r.ok) setUsers(await r.json())
+      if (r.ok) { const data = await r.json(); setUsers(data); cacheSet(CACHE_KEY, data); }
     } catch (e) { console.error(e) } finally { setLoading(false) }
   }
 
   const promoteToAdmin = async (userId: number) => {
     if (!confirm("Передать права администратора? Вы потеряете свои права.")) return
+    // Мгновенно обновляем UI
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: 'ADMIN' } : u))
     try {
       const r = await fetch(`${import.meta.env.VITE_API_URL}/auth/promote-to-admin/${userId}`, { method: "POST", headers: { Authorization: `Bearer ${token}` } })
       if (r.ok) { alert("Права переданы."); window.location.href = "/login"; }
-      else { const d = await r.json(); alert(d.message || "Ошибка"); }
-    } catch { alert("Ошибка") }
+      else { const d = await r.json(); alert(d.message || "Ошибка"); fetchUsers(); } // откат
+    } catch { alert("Ошибка"); fetchUsers(); }
   }
 
   const deleteUser = async (userId: number) => {
     if (!confirm("Удалить пользователя?")) return
+    // Мгновенно убираем из списка
+    const prev = users
+    setUsers(users.filter(u => u.id !== userId))
     try {
       const r = await fetch(`${import.meta.env.VITE_API_URL}/admin/users/${userId}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } })
-      if (r.ok) setUsers(users.filter(u => u.id !== userId))
-      else alert("Ошибка при удалении")
-    } catch { alert("Ошибка") }
+      if (!r.ok) { setUsers(prev); alert("Ошибка при удалении") } // откат
+    } catch { setUsers(prev); alert("Ошибка") }
   }
 
   if (loading) return <LoadingLogo height="300px" />

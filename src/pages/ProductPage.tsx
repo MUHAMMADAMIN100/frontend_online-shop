@@ -6,6 +6,7 @@ import { notify } from "../utils/swal";
 import type { AppDispatch, RootState } from "../app/store";
 import { addToCart, optimisticAdd, optimisticRemove } from "../features/cart/cartSlice";
 import LoadingLogo from "../components/LoadingLogo";
+import { cacheGet, cacheSet } from "../utils/cache";
 
 interface ColorVariant {
   name: string;
@@ -65,14 +66,28 @@ export default function ProductPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const cacheKey = `product-${id}`;
+    const cached = cacheGet<Product>(cacheKey);
+    if (cached) {
+      // Показываем мгновенно из кэша
+      setProduct(cached);
+      const first = cached.colors?.[0] ?? null;
+      setSelectedColor(first);
+      setActiveImage(first?.images?.[0] || cached.image || "");
+      setSelectedSize(null);
+    }
+    // Всегда обновляем в фоне
     axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`)
       .then(res => {
         const p: Product = res.data;
+        cacheSet(cacheKey, p);
         setProduct(p);
-        const first = p.colors?.[0] ?? null;
-        setSelectedColor(first);
-        setActiveImage(first?.images?.[0] || p.image || "");
-        setSelectedSize(null);
+        if (!cached) {
+          const first = p.colors?.[0] ?? null;
+          setSelectedColor(first);
+          setActiveImage(first?.images?.[0] || p.image || "");
+          setSelectedSize(null);
+        }
       })
       .catch(console.error);
   }, [id]);

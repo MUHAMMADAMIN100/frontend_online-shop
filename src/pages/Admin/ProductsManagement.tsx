@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import LoadingLogo from "../../components/LoadingLogo";
+import { cacheGet, cacheSet, cacheInvalidate } from "../../utils/cache";
 
 interface ColorVariant { name: string; hex: string; images: string[]; }
 interface Product {
@@ -26,10 +27,12 @@ const TrashIcon = () => (
   </svg>
 );
 
+const CACHE_KEY = "admin-products";
+
 const ProductsManagement: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.auth);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>(() => cacheGet<Product[]>(CACHE_KEY) ?? []);
+  const [loading, setLoading] = useState(() => !cacheGet(CACHE_KEY));
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -52,7 +55,7 @@ const ProductsManagement: React.FC = () => {
   const fetchProducts = async () => {
     try {
       const r = await fetch(`${import.meta.env.VITE_API_URL}/admin/products`, { headers: { Authorization: `Bearer ${token}` } });
-      if (r.ok) setProducts(await r.json());
+      if (r.ok) { const data = await r.json(); setProducts(data); cacheSet(CACHE_KEY, data); }
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
@@ -79,36 +82,58 @@ const ProductsManagement: React.FC = () => {
       sizes: sizes ? sizes.split(",").map(s => s.trim()).filter(Boolean) : [],
       colors: colors.map(c => ({ ...c, images: c.images.filter(img => img.trim()) }))
     };
-    try {
-      let r: Response;
-      if (editingId) {
-        r = await fetch(`${import.meta.env.VITE_API_URL}/admin/products/${editingId}`, {
-          method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify(body)
+
+    if (editingId) {
+      // ── Оптимистичное редактирование ──
+      const prev = products;
+      const optimistic: Product = { ...body, id: editingId };
+      setProducts(prev.map(p => p.id === editingId ? optimistic : p));
+      resetForm(); setShowForm(false);
+      setMessage("Товар обновлён"); setTimeout(() => setMessage(""), 3000);
+      cacheInvalidate("products"); // сбрасываем кэш главной страницы
+
+      fetch(`${import.meta.env.VITE_API_URL}/admin/products/${editingId}`, {
+        method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }).then(r => {
+        if (r.ok) r.json().then(updated => {
+          setProducts(p => p.map(pr => pr.id === editingId ? updated : pr));
+          cacheSet(CACHE_KEY, products.map(pr => pr.id === editingId ? updated : pr));
         });
-      } else {
-        r = await fetch(`${import.meta.env.VITE_API_URL}/admin/products`, {
-          method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-      }
-      if (r.ok) {
-        const updated = await r.json();
-        if (editingId) setProducts(products.map(p => p.id === editingId ? updated : p));
-        else setProducts([...products, updated]);
-        resetForm(); setShowForm(false);
-        setMessage(editingId ? "Товар обновлён" : "Товар добавлен");
-        setTimeout(() => setMessage(""), 3000);
-      }
-    } catch (e) { console.error(e); }
+        else { setProducts(prev); setMessage("Ошибка при обновлении"); setTimeout(() => setMessage(""), 3000); }
+      }).catch(() => setProducts(prev));
+
+    } else {
+      // ── Оптимистичное добавление (временный ID) ──
+      const tempId = -Date.now();
+      const tempProduct: Product = { ...body, id: tempId };
+      setProducts(prev => [...prev, tempProduct]);
+      resetForm(); setShowForm(false);
+      setMessage("Товар добавлен"); setTimeout(() => setMessage(""), 3000);
+      cacheInvalidate("products");
+
+      fetch(`${import.meta.env.VITE_API_URL}/admin/products`, {
+        method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }).then(r => {
+        if (r.ok) r.json().then(created =>
+          setProducts(p => { const updated = p.map(pr => pr.id === tempId ? created : pr); cacheSet(CACHE_KEY, updated); return updated; })
+        );
+        else setProducts(p => p.filter(pr => pr.id !== tempId)); // откат
+      }).catch(() => setProducts(p => p.filter(pr => pr.id !== tempId)));
+    }
   };
 
   const deleteProduct = async (id: number) => {
     if (!confirm("Удалить товар?")) return;
+    // Мгновенно убираем из списка
+    const prev = products;
+    setProducts(products.filter(p => p.id !== id));
+    cacheInvalidate("products");
     try {
       const r = await fetch(`${import.meta.env.VITE_API_URL}/admin/products/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
-      if (r.ok) setProducts(products.filter(p => p.id !== id));
-    } catch (e) { console.error(e); }
+      if (!r.ok) setProducts(prev); // откат
+    } catch { setProducts(prev); }
   };
 
   // Color helpers

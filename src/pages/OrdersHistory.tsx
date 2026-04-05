@@ -2,20 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
 import LoadingLogo from "../components/LoadingLogo";
+import { cacheGet, cacheSet } from "../utils/cache";
 
 interface OrderItem { id: number; product: { id: number; name: string; price: number; image?: string }; quantity: number; price: number; }
 interface Order { id: number; createdAt: string; items: OrderItem[]; }
 
 const OrdersHistory: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.auth);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState<Order[]>(() => cacheGet<Order[]>("orders") ?? []);
+  const [loading, setLoading] = useState(() => !cacheGet("orders"));
 
   useEffect(() => {
     if (!token) return;
+    // Всегда обновляем в фоне
     fetch(`${import.meta.env.VITE_API_URL}/orders`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.ok ? r.json() : [])
-      .then(data => setOrders(data))
+      .then(data => { setOrders(data); cacheSet("orders", data); })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [token]);
