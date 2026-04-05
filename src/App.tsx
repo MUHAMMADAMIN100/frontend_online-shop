@@ -7,6 +7,7 @@ import Checkout from "./pages/Checkout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useDispatch, useSelector } from "react-redux";
@@ -58,9 +59,9 @@ export default function App() {
   }, [cartError]);
 
   return (
-    <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#F7F4EF', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
-      <main>
+      <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/product/:id" element={<ProductPage />} />
@@ -79,6 +80,7 @@ export default function App() {
           />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

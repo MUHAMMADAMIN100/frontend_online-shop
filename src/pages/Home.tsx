@@ -5,9 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { notify } from "../utils/swal";
 import type { AppDispatch, RootState } from "../app/store";
 import { addToCart } from "../features/cart/cartSlice";
+import LoadingLogo from "../components/LoadingLogo";
 
 export default function Home() {
   const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const dispatch = useDispatch<AppDispatch>();
   const token = useSelector((state: RootState) => state.auth.token);
@@ -18,10 +20,12 @@ export default function Home() {
   const maxPrice = searchParams.get("maxPrice") || "";
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(`${import.meta.env.VITE_API_URL}/products`)
       .then(res => setProducts(res.data))
-      .catch(err => console.error(err));
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = products.filter(p => {
@@ -44,6 +48,8 @@ export default function Home() {
       notify.error("Errore", "Не удалось добавить товар");
     }
   };
+
+  if (loading) return <LoadingLogo height="80vh" />;
 
   return (
     <div style={{ backgroundColor: "#F7F4EF", minHeight: "100vh", padding: "60px 40px" }}>
@@ -151,8 +157,12 @@ export default function Home() {
 
       {filtered.length === 0 && (
         <div className="animate-fadeIn" style={{ textAlign: "center", padding: "80px 0" }}>
-          <p className="serif" style={{ fontSize: 24, color: "#8B0000", marginBottom: 8 }}>Товары не найдены</p>
-          <p style={{ fontSize: 11, letterSpacing: 2, color: "#888", fontFamily: "Montserrat" }}>Попробуйте изменить фильтры</p>
+          <p className="serif" style={{ fontSize: 24, color: "#8B0000", marginBottom: 8 }}>
+            {search || category || minPrice || maxPrice ? "Товары не найдены" : "Каталог пуст"}
+          </p>
+          <p style={{ fontSize: 11, letterSpacing: 2, color: "#888", fontFamily: "Montserrat" }}>
+            {search || category || minPrice || maxPrice ? "Попробуйте изменить фильтры" : "Товары появятся здесь"}
+          </p>
         </div>
       )}
     </div>
