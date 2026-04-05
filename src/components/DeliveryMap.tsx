@@ -127,9 +127,9 @@ export default function DeliveryMap({ onAddressChange }: Props) {
       <div
         ref={containerRef}
         style={{
-          height: 280, width: "100%",
+          height: 210, width: "100%",
           border: "1px solid #D9CFC0",
-          marginBottom: 10,
+          marginBottom: 8,
           opacity: mapReady ? 1 : 0.5,
           transition: "opacity 0.3s"
         }}

@@ -16,6 +16,7 @@ const Cart: React.FC = () => {
   const [initialLoad, setInitialLoad] = useState(true);
   const [localQty, setLocalQty] = useState<Record<number, number>>({});
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const [orderCompleted, setOrderCompleted] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -206,64 +207,87 @@ const Cart: React.FC = () => {
 
       {/* ══ Модальное окно оформления заказа ══ */}
       {showCheckout && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '20px' }}>
-          <div className="animate-scaleUp" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '40px', width: '100%', maxWidth: 620, maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '16px' }}>
+          <div className="animate-scaleUp" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '32px 28px', width: '100%', maxWidth: 480, maxHeight: '92vh', overflowY: 'auto' }}>
 
-            <div style={{ textAlign: 'center', marginBottom: 28 }}>
-              <h2 className="serif" style={{ fontSize: 24, color: '#8B0000', letterSpacing: 3, fontWeight: 500 }}>Форма заказа</h2>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 12 }}>
+            {/* Заголовок */}
+            <div style={{ textAlign: 'center', marginBottom: 22 }}>
+              <h2 className="serif" style={{ fontSize: 22, color: '#8B0000', letterSpacing: 3, fontWeight: 500, marginBottom: 10 }}>Оформление заказа</h2>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 <div style={{ width: 20, height: 1, backgroundColor: '#008000' }} />
                 <div style={{ width: 4, height: 4, backgroundColor: '#FF0000', borderRadius: '50%' }} />
                 <div style={{ width: 20, height: 1, backgroundColor: '#FF0000' }} />
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <input
-                placeholder="Имя"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                style={{ border: '1px solid #D9CFC0', padding: '11px 14px', fontFamily: 'Montserrat', fontSize: 13, outline: 'none' }}
-                onFocus={e => (e.target.style.borderColor = '#8B0000')}
-                onBlur={e => (e.target.style.borderColor = '#D9CFC0')}
-              />
-              <input
-                placeholder="Телефон"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                style={{ border: '1px solid #D9CFC0', padding: '11px 14px', fontFamily: 'Montserrat', fontSize: 13, outline: 'none' }}
-                onFocus={e => (e.target.style.borderColor = '#8B0000')}
-                onBlur={e => (e.target.style.borderColor = '#D9CFC0')}
-              />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-              {/* Карта для выбора адреса */}
-              <div>
-                <p style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#555', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 8 }}>
-                  Адрес доставки
-                </p>
-                <DeliveryMap onAddressChange={setAddress} />
-
-                {/* Ручной ввод адреса как fallback */}
+              {/* Имя + телефон в ряд */}
+              <div style={{ display: 'flex', gap: 10 }}>
                 <input
-                  placeholder="Или введите адрес вручную"
-                  value={address}
-                  onChange={e => setAddress(e.target.value)}
-                  style={{ border: '1px solid #D9CFC0', padding: '10px 14px', fontFamily: 'Montserrat', fontSize: 12, outline: 'none', width: '100%', marginTop: 10 }}
+                  placeholder="Имя"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  style={{ flex: 1, border: '1px solid #D9CFC0', padding: '10px 12px', fontFamily: 'Montserrat', fontSize: 13, outline: 'none' }}
+                  onFocus={e => (e.target.style.borderColor = '#8B0000')}
+                  onBlur={e => (e.target.style.borderColor = '#D9CFC0')}
+                />
+                <input
+                  placeholder="Телефон"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  style={{ flex: 1, border: '1px solid #D9CFC0', padding: '10px 12px', fontFamily: 'Montserrat', fontSize: 13, outline: 'none' }}
                   onFocus={e => (e.target.style.borderColor = '#8B0000')}
                   onBlur={e => (e.target.style.borderColor = '#D9CFC0')}
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+              {/* Адрес — ввод + кнопка открыть карту */}
+              <div style={{ position: 'relative' }}>
+                <input
+                  placeholder="Адрес доставки"
+                  value={address}
+                  onChange={e => setAddress(e.target.value)}
+                  style={{ width: '100%', border: '1px solid #D9CFC0', padding: '10px 44px 10px 12px', fontFamily: 'Montserrat', fontSize: 13, outline: 'none' }}
+                  onFocus={e => (e.target.style.borderColor = '#8B0000')}
+                  onBlur={e => (e.target.style.borderColor = '#D9CFC0')}
+                />
+                {/* Иконка карты */}
+                <button
+                  type="button"
+                  onClick={() => setShowMap(m => !m)}
+                  title={showMap ? "Скрыть карту" : "Выбрать на карте"}
+                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', border: 'none', background: 'none', cursor: 'pointer', color: showMap ? '#8B0000' : '#888', padding: 4 }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </button>
+              </div>
+
+              {/* Карта — раскрывается по кнопке */}
+              {showMap && (
+                <div className="animate-fadeIn">
+                  <DeliveryMap onAddressChange={(addr) => { setAddress(addr); }} />
+                </div>
+              )}
+
+              {/* Итого */}
+              <div style={{ backgroundColor: '#F7F4EF', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat' }}>Итого</span>
+                <span className="serif" style={{ fontSize: 22, color: '#FF0000', fontWeight: 600 }}>{totalPrice.toLocaleString()} ₽</span>
+              </div>
+
+              <div style={{ display: 'flex', gap: 10 }}>
                 <button
                   onClick={handleCheckout}
                   disabled={orderLoading}
                   className="btn-primary"
-                  style={{ flex: 1, textAlign: 'center', opacity: orderLoading ? 0.7 : 1 }}
+                  style={{ flex: 2, textAlign: 'center', opacity: orderLoading ? 0.7 : 1 }}
                 >
-                  {orderLoading ? "..." : "Создать заказ"}
+                  {orderLoading ? "Оформляем..." : "Создать заказ"}
                 </button>
-                <button onClick={() => setShowCheckout(false)} className="btn-secondary" style={{ flex: 1, textAlign: 'center' }}>
+                <button onClick={() => { setShowCheckout(false); setShowMap(false); }} className="btn-secondary" style={{ flex: 1, textAlign: 'center' }}>
                   Отмена
                 </button>
               </div>
