@@ -169,7 +169,7 @@ const Cart: React.FC = () => {
                         style={{ width: 80, height: 80, objectFit: 'cover' }} />
                       <div style={{ flex: 1 }}>
                         <h3 className="serif" style={{ fontSize: 16, color: '#1A1A1A', fontWeight: 500, marginBottom: 4 }}>{item.product.name}</h3>
-                        <p style={{ fontSize: 14, color: '#FF0000', fontFamily: 'Montserrat', fontWeight: 600 }}>{item.product.price.toLocaleString()} ₽</p>
+                        <p style={{ fontSize: 14, color: '#FF0000', fontFamily: 'Montserrat', fontWeight: 600 }}>{item.product.price.toLocaleString()} $</p>
                         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
                           {item.size && (
                             <span style={{ fontSize: 10, fontFamily: 'Montserrat', letterSpacing: 1, color: '#555', backgroundColor: '#F7F4EF', border: '1px solid #D9CFC0', padding: '2px 8px' }}>
@@ -207,7 +207,7 @@ const Cart: React.FC = () => {
                         </button>
                       </div>
                       <p className="serif" style={{ fontSize: 18, color: '#1A1A1A', fontWeight: 600, minWidth: 100, textAlign: 'right' }}>
-                        {(qty * item.product.price).toLocaleString()} ₽
+                        {(qty * item.product.price).toLocaleString()} $
                       </p>
                     </div>
                   );
@@ -218,7 +218,7 @@ const Cart: React.FC = () => {
             <div className="cart-footer" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '28px 32px', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
               <div>
                 <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Итого</p>
-                <p className="serif" style={{ fontSize: 28, color: '#FF0000', fontWeight: 600 }}>{totalPrice.toLocaleString()} ₽</p>
+                <p className="serif" style={{ fontSize: 28, color: '#FF0000', fontWeight: 600 }}>{totalPrice.toLocaleString()} $</p>
               </div>
               <div className="cart-footer-buttons" style={{ display: 'flex', gap: 12 }}>
                 <button onClick={handleClear} className="btn-secondary">Очистить</button>
@@ -305,7 +305,7 @@ const Cart: React.FC = () => {
               {/* Итого */}
               <div style={{ backgroundColor: '#F7F4EF', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat' }}>Итого</span>
-                <span className="serif" style={{ fontSize: 22, color: '#FF0000', fontWeight: 600 }}>{totalPrice.toLocaleString()} ₽</span>
+                <span className="serif" style={{ fontSize: 22, color: '#FF0000', fontWeight: 600 }}>{totalPrice.toLocaleString()} $</span>
               </div>
 
               <div style={{ display: 'flex', gap: 10 }}>

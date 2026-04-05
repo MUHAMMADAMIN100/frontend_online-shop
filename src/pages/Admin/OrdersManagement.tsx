@@ -124,7 +124,7 @@ const OrdersManagement: React.FC = () => {
                     {order.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-gray-900 text-sm">{order.total}₽</td>
+                <td className="px-6 py-4 text-gray-900 text-sm">{order.total}$</td>
                 <td className="px-6 py-4 text-gray-900 text-sm">
                   {new Date(order.createdAt).toLocaleDateString("ru-RU")}
                 </td>

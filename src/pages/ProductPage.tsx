@@ -261,7 +261,7 @@ export default function ProductPage() {
           </div>
 
           <p className="serif animate-fadeInDelay2" style={{ fontSize: 36, color: "#FF0000", fontWeight: 600, marginBottom: 14 }}>
-            {product.price.toLocaleString()} ₽
+            {product.price.toLocaleString()} $
           </p>
 
           {/* Статус наличия */}

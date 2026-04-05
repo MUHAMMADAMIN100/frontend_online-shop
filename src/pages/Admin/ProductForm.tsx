@@ -196,7 +196,7 @@ export default function ProductForm() {
 
         <div style={{ display: "flex", gap: 16 }}>
           <div style={{ flex: 1 }}>
-            <label style={labelStyle}>Цена (₽)</label>
+            <label style={labelStyle}>Цена ($)</label>
             <input name="price" type="number" value={product.price} onChange={handleChange} required style={fieldStyle}
               onFocus={e => (e.target.style.borderColor = "#FF0000")}
               onBlur={e => (e.target.style.borderColor = "#D9CFC0")}

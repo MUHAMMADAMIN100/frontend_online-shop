@@ -243,7 +243,7 @@ const ProductsManagement: React.FC = () => {
                   <p style={{ fontSize: 10, color: '#888', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.description}</p>
                 </td>
                 <td style={{ padding: '12px 16px' }}>
-                  <span className="serif" style={{ fontSize: 16, color: '#FF0000', fontWeight: 600 }}>{p.price.toLocaleString()} ₽</span>
+                  <span className="serif" style={{ fontSize: 16, color: '#FF0000', fontWeight: 600 }}>{p.price.toLocaleString()} $</span>
                 </td>
                 <td style={{ padding: '12px 16px' }}>
                   <span style={{ padding: '3px 10px', backgroundColor: '#008000', color: '#FFFFFF', fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 600 }}>{p.category}</span>
@@ -310,7 +310,7 @@ const ProductsManagement: React.FC = () => {
 
               {/* Цена + Склад + Категория в ряд */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-                <input type="number" placeholder="Цена (₽)" value={price} onChange={e => setPrice(e.target.value)} required style={inputStyle}
+                <input type="number" placeholder="Цена ($)" value={price} onChange={e => setPrice(e.target.value)} required style={inputStyle}
                   onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
                 <input type="number" placeholder="Остаток" value={stock} onChange={e => setStock(e.target.value)} min={0} style={inputStyle}
                   onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />

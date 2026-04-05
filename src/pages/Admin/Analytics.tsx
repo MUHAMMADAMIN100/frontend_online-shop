@@ -49,7 +49,7 @@ function BarChart({ data, valueKey, labelKey, colorFn, unit = "", maxBarHeight =
           const scale = isSelected ? 1.06 : isHovered ? 1.04 : 1;
           const label = String(d[labelKey]);
           const shortLabel = label.length > 10 ? label.slice(0, 9) + "…" : label;
-          const valStr = unit === "₽" ? `${Number(d[valueKey]).toLocaleString("ru")}₽` : `${d[valueKey]}${unit}`;
+          const valStr = unit === "$" ? `${Number(d[valueKey]).toLocaleString("ru")}$` : `${d[valueKey]}${unit}`;
 
           return (
             <g
@@ -139,7 +139,7 @@ function DonutChart({ data, valueKey, labelKey, onSelect, selectedId }: {
           />
         ))}
         <text x={cx} y={cy - 6} textAnchor="middle" fontSize={11} fontFamily="Montserrat" fontWeight="600" fill="#1A1A1A">Итого</text>
-        <text x={cx} y={cy + 10} textAnchor="middle" fontSize={10} fontFamily="Montserrat" fill="#555">{total.toLocaleString("ru")} ₽</text>
+        <text x={cx} y={cy + 10} textAnchor="middle" fontSize={10} fontFamily="Montserrat" fill="#555">{total.toLocaleString("ru")} $</text>
       </svg>
       <div style={{ flex: 1, minWidth: 120 }}>
         {slices.map((s, i) => (
@@ -153,7 +153,7 @@ function DonutChart({ data, valueKey, labelKey, onSelect, selectedId }: {
             <div style={{ width: 12, height: 12, borderRadius: 2, backgroundColor: s.color, flexShrink: 0 }} />
             <div style={{ minWidth: 0, flex: 1 }}>
               <p style={{ fontSize: 11, fontFamily: "Montserrat", color: "#1A1A1A", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: s.isSelected ? 600 : 400 }}>{s.label}</p>
-              <p style={{ fontSize: 10, fontFamily: "Montserrat", color: "#888", margin: 0 }}>{s.pct}% · {Number(s.value).toLocaleString("ru")} ₽</p>
+              <p style={{ fontSize: 10, fontFamily: "Montserrat", color: "#888", margin: 0 }}>{s.pct}% · {Number(s.value).toLocaleString("ru")} $</p>
             </div>
           </div>
         ))}
@@ -226,8 +226,8 @@ function ProductDetailPanel({ product, totalRevenue, totalSold, colorIdx, onClos
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
         {[
           { label: "Продано", value: `${product.sold} шт`, color: "#8B0000" },
-          { label: "Выручка", value: `${product.revenue.toLocaleString("ru")} ₽`, color: "#FF0000" },
-          { label: "Ср. цена", value: `${avgPrice.toLocaleString("ru")} ₽`, color: "#1565C0" },
+          { label: "Выручка", value: `${product.revenue.toLocaleString("ru")} $`, color: "#FF0000" },
+          { label: "Ср. цена", value: `${avgPrice.toLocaleString("ru")} $`, color: "#1565C0" },
           { label: "На складе", value: product.stock === 0 ? "Нет" : `${product.stock} шт`, color: product.stock === 0 ? "#FF0000" : product.stock <= 5 ? "#CC8800" : "#008000" },
           { label: "Доля выручки", value: `${revPct}%`, color },
           { label: "Доля продаж", value: `${soldPct}%`, color },
@@ -337,12 +337,12 @@ export default function Analytics() {
       {/* KPI */}
       <p style={{ fontSize: 9, letterSpacing: 3, textTransform: "uppercase", color: "#888", fontFamily: "Montserrat", marginBottom: 12 }}>Этот месяц</p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14, marginBottom: 14 }}>
-        <StatCard label="Доход" value={`${data.thisMonth.revenue.toLocaleString("ru")} ₽`} sub={revenueGrowth !== null ? `${revenueGrowth >= 0 ? "+" : ""}${revenueGrowth}% к прошлому` : undefined} color={revenueGrowth !== null && revenueGrowth >= 0 ? "#008000" : "#FF0000"} />
+        <StatCard label="Доход" value={`${data.thisMonth.revenue.toLocaleString("ru")} $`} sub={revenueGrowth !== null ? `${revenueGrowth >= 0 ? "+" : ""}${revenueGrowth}% к прошлому` : undefined} color={revenueGrowth !== null && revenueGrowth >= 0 ? "#008000" : "#FF0000"} />
         <StatCard label="Заказы" value={data.thisMonth.orders} sub={ordersGrowth !== null ? `${ordersGrowth >= 0 ? "+" : ""}${ordersGrowth}% к прошлому` : undefined} color="#8B0000" />
         <StatCard label="Всего клиентов" value={data.totalStats.users} color="#1565C0" />
         <StatCard label="Всего товаров" value={data.totalStats.products} color="#2E7D32" />
         <StatCard label="Всего заказов" value={data.totalStats.orders} color="#8B0000" />
-        <StatCard label="Общая выручка" value={`${data.totalStats.revenue.toLocaleString("ru")} ₽`} color="#FF0000" />
+        <StatCard label="Общая выручка" value={`${data.totalStats.revenue.toLocaleString("ru")} $`} color="#FF0000" />
       </div>
 
       {/* Панель выбранного товара */}
@@ -359,7 +359,7 @@ export default function Analytics() {
       {/* Сравнение месяцев */}
       <div className="charts-grid">
         <ChartCard title="Выручка: этот vs прошлый месяц" subtitle="Сравнение">
-          <BarChart data={monthCompare} valueKey="revenue" labelKey="label" unit="₽" colorFn={i => i === 1 ? "#8B0000" : "#D9CFC0"} maxBarHeight={120} />
+          <BarChart data={monthCompare} valueKey="revenue" labelKey="label" unit="$" colorFn={i => i === 1 ? "#8B0000" : "#D9CFC0"} maxBarHeight={120} />
         </ChartCard>
         <ChartCard title="Заказы: этот vs прошлый месяц" subtitle="Сравнение">
           <BarChart data={monthCompare} valueKey="orders" labelKey="label" unit=" шт" colorFn={i => i === 1 ? "#008000" : "#D9CFC0"} maxBarHeight={120} />
@@ -372,7 +372,7 @@ export default function Analytics() {
           <BarChart data={data.topProducts} valueKey="sold" labelKey="name" unit=" шт" maxBarHeight={140} onSelect={handleSelect} selectedId={selectedProduct?.id} />
         </ChartCard>
         <ChartCard title="Выручка по товарам" subtitle="Доход" hint>
-          <BarChart data={data.topProducts} valueKey="revenue" labelKey="name" unit="₽" maxBarHeight={140} onSelect={handleSelect} selectedId={selectedProduct?.id} />
+          <BarChart data={data.topProducts} valueKey="revenue" labelKey="name" unit="$" maxBarHeight={140} onSelect={handleSelect} selectedId={selectedProduct?.id} />
         </ChartCard>
       </div>
 
@@ -426,7 +426,7 @@ export default function Analytics() {
                     <span style={{ fontSize: 12, fontFamily: "Montserrat", color: "#1A1A1A", fontWeight: isSelected ? 600 : 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
                   </div>
                   <p style={{ fontSize: 13, fontFamily: "Montserrat", fontWeight: 700, color: "#8B0000", margin: 0 }}>{p.sold} шт</p>
-                  <p style={{ fontSize: 12, fontFamily: "Montserrat", color: "#1A1A1A", margin: 0 }}>{p.revenue.toLocaleString("ru")} ₽</p>
+                  <p style={{ fontSize: 12, fontFamily: "Montserrat", color: "#1A1A1A", margin: 0 }}>{p.revenue.toLocaleString("ru")} $</p>
                   <span style={{ fontSize: 11, fontWeight: 700, fontFamily: "Montserrat", color: p.stock === 0 ? "#fff" : p.stock <= 5 ? "#CC8800" : "#008000", backgroundColor: p.stock === 0 ? "#FF0000" : "transparent", padding: p.stock === 0 ? "2px 8px" : 0, display: "inline-block" }}>
                     {p.stock === 0 ? "Нет" : `${p.stock} шт`}
                   </span>
