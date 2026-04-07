@@ -11,7 +11,7 @@ interface Product {
   colors?: ColorVariant[]; sizes?: string[]; stock?: number;
 }
 
-const CATEGORIES = ["Футболки", "Кроссовки", "Шорты"];
+const CATEGORIES = ["Футболки", "Кроссовки", "Шорты", "КОЛЛЕКЦИЯ"];
 
 // SVG-иконки
 const EditIcon = () => (
@@ -49,6 +49,22 @@ const ProductsManagement: React.FC = () => {
   const [stock, setStock] = useState("0");
   const [sizes, setSizes] = useState("");
   const [colors, setColors] = useState<ColorVariant[]>([]);
+  const [uploadingMain, setUploadingMain] = useState(false);
+  const [uploadingColor, setUploadingColor] = useState<string | null>(null); // "ci-ii"
+
+  const uploadFile = async (file: File): Promise<string | null> => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/products/upload`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      const data = await res.json();
+      return data.url ?? null;
+    } catch { return null; }
+  };
 
   useEffect(() => { fetchProducts(); }, []);
 
@@ -320,10 +336,33 @@ const ProductsManagement: React.FC = () => {
                 </select>
               </div>
 
-              {/* URL фото + Размеры в ряд */}
+              {/* Фото + Размеры в ряд */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <input placeholder="URL главного фото" value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={inputStyle}
-                  onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                  <label style={{
+                    display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+                    border: '1px solid #008000', color: '#008000', padding: '9px 12px',
+                    fontFamily: 'Montserrat', fontSize: 10, letterSpacing: 1, textTransform: 'uppercase',
+                    background: 'transparent', borderRadius: 8, transition: 'all 0.2s',
+                  }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#008000'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#008000'; }}
+                  >
+                    <i className="fas fa-upload" style={{ fontSize: 11 }} />
+                    {uploadingMain ? 'Загрузка...' : 'Загрузить фото'}
+                    <input type="file" accept="image/*" style={{ display: 'none' }} disabled={uploadingMain}
+                      onChange={async e => {
+                        const f = e.target.files?.[0]; if (!f) return;
+                        setUploadingMain(true);
+                        const url = await uploadFile(f);
+                        if (url) setImageUrl(url);
+                        setUploadingMain(false);
+                      }} />
+                  </label>
+                  {imageUrl && <img src={imageUrl} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4, border: '1px solid #D9CFC0' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />}
+                  <input placeholder="или вставьте URL" value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={{ ...inputStyle, fontSize: 11 }}
+                    onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
+                </div>
                 <input placeholder="Размеры: XS, S, M или 36, 37" value={sizes} onChange={e => setSizes(e.target.value)} style={inputStyle}
                   onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
               </div>
@@ -362,10 +401,27 @@ const ProductsManagement: React.FC = () => {
                     {/* Фотографии */}
                     {color.images.map((img, ii) => (
                       <div key={ii} style={{ display: 'flex', gap: 6, marginBottom: 5, alignItems: 'center' }}>
+                        <label style={{
+                          display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', flexShrink: 0,
+                          border: '1px solid #D9CFC0', color: '#888', padding: '6px 10px', borderRadius: 6,
+                          fontFamily: 'Montserrat', fontSize: 10, background: 'transparent', whiteSpace: 'nowrap',
+                        }}>
+                          <i className="fas fa-upload" style={{ fontSize: 10 }} />
+                          {uploadingColor === `${ci}-${ii}` ? '...' : 'Файл'}
+                          <input type="file" accept="image/*" style={{ display: 'none' }}
+                            disabled={uploadingColor === `${ci}-${ii}`}
+                            onChange={async e => {
+                              const f = e.target.files?.[0]; if (!f) return;
+                              setUploadingColor(`${ci}-${ii}`);
+                              const url = await uploadFile(f);
+                              if (url) updateColorImage(ci, ii, url);
+                              setUploadingColor(null);
+                            }} />
+                        </label>
                         <input value={img} onChange={e => updateColorImage(ci, ii, e.target.value)}
-                          placeholder="URL фото" style={{ ...inputStyle, flex: 1, padding: '6px 10px', fontSize: 11 }}
+                          placeholder="или URL фото" style={{ ...inputStyle, flex: 1, padding: '6px 10px', fontSize: 11 }}
                           onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
-                        {img && <img src={img} alt="" style={{ width: 32, height: 32, objectFit: 'cover', border: '1px solid #D9CFC0', flexShrink: 0 }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />}
+                        {img && <img src={img} alt="" style={{ width: 32, height: 32, objectFit: 'cover', border: '1px solid #D9CFC0', borderRadius: 4, flexShrink: 0 }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />}
                         {color.images.length > 1 && (
                           <button type="button" onClick={() => removeColorImage(ci, ii)} style={{ border: 'none', background: 'none', color: '#aaa', cursor: 'pointer', padding: 2, flexShrink: 0, fontSize: 14 }}>✕</button>
                         )}

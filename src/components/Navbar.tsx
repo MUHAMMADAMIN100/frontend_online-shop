@@ -315,6 +315,7 @@ export default function Navbar() {
                 <option value="Кроссовки">Кроссовки</option>
                 <option value="Футболки">Футболки</option>
                 <option value="Шорты">Шорты</option>
+                <option value="КОЛЛЕКЦИЯ">КОЛЛЕКЦИЯ</option>
               </select>
               <div style={{ display: "flex", gap: 8 }}>
                 <input
