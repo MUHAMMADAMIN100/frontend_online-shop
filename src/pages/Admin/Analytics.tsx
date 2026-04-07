@@ -116,7 +116,7 @@ function DonutChart({ data, valueKey, labelKey, onSelect, selectedId }: {
     const ix1 = cx + innerR * Math.cos(endAngle),  iy1 = cy + innerR * Math.sin(endAngle);
     const ix2 = cx + innerR * Math.cos(startAngle), iy2 = cy + innerR * Math.sin(startAngle);
     const large = frac > 0.5 ? 1 : 0;
-    const path = `M ${x1} сом.{y1} A ${rOuter} сом.{rOuter} 0 ${large} 1 ${x2} сом.{y2} L ${ix1} сом.{iy1} A ${innerR} сом.{innerR} 0 ${large} 0 ${ix2} сом.{iy2} Z`;
+    const path = `M ${x1} ${y1} A ${rOuter} ${rOuter} 0 ${large} 1 ${x2} ${y2} L ${ix1} ${iy1} A ${innerR} ${innerR} 0 ${large} 0 ${ix2} ${iy2} Z`;
     const isSelected = selectedId != null && d.id === selectedId;
     return { path, color: COLORS[i % COLORS.length], label: d[labelKey], pct: Math.round(frac * 100), value: d[valueKey], isSelected, item: d };
   });
