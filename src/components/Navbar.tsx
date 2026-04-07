@@ -128,11 +128,12 @@ export default function Navbar() {
                   <option value="Кроссовки">Кроссовки</option>
                   <option value="Футболки">Футболки</option>
                   <option value="Шорты">Шорты</option>
+                  <option value="КОЛЛЕКЦИЯ">КОЛЛЕКЦИЯ</option>
                 </select>
                 <input
                   className="nav-filter"
                   type="number"
-                  placeholder="от $"
+                  placeholder="от сом."
                   value={searchParams.get("minPrice") || ""}
                   onChange={e => updateFilter("minPrice", e.target.value)}
                   style={{ width: 75 }}
@@ -140,7 +141,7 @@ export default function Navbar() {
                 <input
                   className="nav-filter"
                   type="number"
-                  placeholder="до $"
+                  placeholder="до сом."
                   value={searchParams.get("maxPrice") || ""}
                   onChange={e => updateFilter("maxPrice", e.target.value)}
                   style={{ width: 75 }}
@@ -318,14 +319,14 @@ export default function Navbar() {
               <div style={{ display: "flex", gap: 8 }}>
                 <input
                   type="number"
-                  placeholder="от $"
+                  placeholder="от сом."
                   value={searchParams.get("minPrice") || ""}
                   onChange={e => updateFilter("minPrice", e.target.value)}
                   style={{ flex: 1 }}
                 />
                 <input
                   type="number"
-                  placeholder="до $"
+                  placeholder="до сом."
                   value={searchParams.get("maxPrice") || ""}
                   onChange={e => updateFilter("maxPrice", e.target.value)}
                   style={{ flex: 1 }}

@@ -81,9 +81,9 @@ const OrdersHistory: React.FC = () => {
                       <img src={item.product.image || "https://via.placeholder.com/60"} alt={item.product.name} style={{ width: 60, height: 60, objectFit: 'cover' }} />
                       <div style={{ flex: 1 }}>
                         <p className="serif" style={{ fontSize: 15, color: '#1A1A1A', fontWeight: 500 }}>{item.product.name}</p>
-                        <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat' }}>{item.quantity} × {item.price.toLocaleString()} $</p>
+                        <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat' }}>{item.quantity} × {item.price.toLocaleString()} сом.</p>
                       </div>
-                      <p className="serif" style={{ fontSize: 16, color: '#008000', fontWeight: 600 }}>{(item.quantity * item.price).toLocaleString()} $</p>
+                      <p className="serif" style={{ fontSize: 16, color: '#008000', fontWeight: 600 }}>{(item.quantity * item.price).toLocaleString()} сом.</p>
                     </div>
                   ))}
                 </div>
@@ -92,7 +92,7 @@ const OrdersHistory: React.FC = () => {
                   <div style={{ textAlign: 'right' }}>
                     <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Итого</p>
                     <p className="serif" style={{ fontSize: 24, color: '#008000', fontWeight: 600 }}>
-                      {order.items.reduce((s, i) => s + i.quantity * i.price, 0).toLocaleString()} $
+                      {order.items.reduce((s, i) => s + i.quantity * i.price, 0).toLocaleString()} сом.
                     </p>
                   </div>
                 </div>

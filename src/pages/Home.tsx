@@ -144,7 +144,7 @@ export default function Home() {
                 </p>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <p className="serif" style={{ fontSize: 20, color: "#008000", fontWeight: 600 }}>
-                    {product.price.toLocaleString()} $
+                    {product.price.toLocaleString()} сом.
                   </p>
                   {product.stock !== undefined && product.stock <= 5 && product.stock > 0 && (
                     <span style={{ fontSize: 9, color: "#CC8800", fontFamily: "Montserrat", letterSpacing: 1 }}>

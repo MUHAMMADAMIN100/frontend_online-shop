@@ -8,7 +8,7 @@ export default function ProductCard({ product, onAdd }: { product: Product; onAd
       <h3 className="font-medium">{product.name}</h3>
       <div className="mb-2 text-gray-600 text-sm">{product.category}</div>
       <div className="flex justify-between items-center mt-auto">
-        <div className="font-bold">{product.price} $</div>
+        <div className="font-bold">{product.price} сом.</div>
         <div className="flex items-center space-x-2">
           <Link to={`/product/${product.id}`} className="text-sm underline">View</Link>
           <button onClick={onAdd} className="bg-blue-600 px-3 py-1 rounded text-white text-sm">Add</button>

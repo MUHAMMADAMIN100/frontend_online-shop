@@ -48,6 +48,7 @@ export default function ProductForm() {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -65,9 +66,31 @@ export default function ProductForm() {
     }
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setProduct(prev => ({ ...prev, [name]: name === "price" || name === "stock" ? Number(value) : value }));
+  };
+
+  const handleImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/products/upload`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) setProduct(prev => ({ ...prev, image: data.url }));
+    } catch (err) {
+      console.error("Upload error:", err);
+    } finally {
+      setUploading(false);
+    }
   };
 
   // Color helpers
@@ -169,21 +192,62 @@ export default function ProductForm() {
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-        {/* Basic fields */}
-        {[
-          { label: "Название", name: "name", type: "text", required: true },
-          { label: "URL главного изображения", name: "image", type: "text" },
-          { label: "Категория", name: "category", type: "text" },
-        ].map(f => (
-          <div key={f.name}>
-            <label style={labelStyle}>{f.label}</label>
-            <input name={f.name} type={f.type} value={(product as any)[f.name]} onChange={handleChange}
-              required={f.required} style={fieldStyle}
-              onFocus={e => (e.target.style.borderColor = "#FF0000")}
-              onBlur={e => (e.target.style.borderColor = "#D9CFC0")}
-            />
+        {/* Название */}
+        <div>
+          <label style={labelStyle}>Название</label>
+          <input name="name" type="text" value={product.name} onChange={handleChange} required style={fieldStyle}
+            onFocus={e => (e.target.style.borderColor = "#FF0000")}
+            onBlur={e => (e.target.style.borderColor = "#D9CFC0")}
+          />
+        </div>
+
+        {/* Изображение */}
+        <div>
+          <label style={labelStyle}>Изображение</label>
+          {/* Загрузка с компьютера */}
+          <div style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "center" }}>
+            <label style={{
+              display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer",
+              border: "1px solid #008000", color: "#008000", padding: "8px 18px",
+              fontFamily: "Montserrat", fontSize: 10, letterSpacing: 2,
+              textTransform: "uppercase", background: "transparent", transition: "all 0.2s",
+              borderRadius: 8,
+            }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "#008000"; (e.currentTarget as HTMLElement).style.color = "#fff"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLElement).style.color = "#008000"; }}
+            >
+              <i className="fas fa-upload" style={{ fontSize: 12 }} />
+              {uploading ? "Загрузка..." : "Загрузить с компьютера"}
+              <input type="file" accept="image/*" onChange={handleImageFile} style={{ display: "none" }} disabled={uploading} />
+            </label>
+            {product.image && (
+              <img src={product.image} alt="preview" style={{ width: 56, height: 56, objectFit: "cover", border: "1px solid #D9CFC0", borderRadius: 6 }}
+                onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+              />
+            )}
           </div>
-        ))}
+          {/* Или по ссылке */}
+          <input name="image" type="text" value={product.image} onChange={handleChange}
+            placeholder="или вставьте URL изображения" style={fieldStyle}
+            onFocus={e => (e.target.style.borderColor = "#FF0000")}
+            onBlur={e => (e.target.style.borderColor = "#D9CFC0")}
+          />
+        </div>
+
+        {/* Категория */}
+        <div>
+          <label style={labelStyle}>Категория</label>
+          <select name="category" value={product.category} onChange={handleChange} style={fieldStyle}
+            onFocus={e => (e.target.style.borderColor = "#FF0000")}
+            onBlur={e => (e.target.style.borderColor = "#D9CFC0")}
+          >
+            <option value="">— Выберите категорию —</option>
+            <option value="Кроссовки">Кроссовки</option>
+            <option value="Футболки">Футболки</option>
+            <option value="Шорты">Шорты</option>
+            <option value="КОЛЛЕКЦИЯ">КОЛЛЕКЦИЯ</option>
+          </select>
+        </div>
 
         <div>
           <label style={labelStyle}>Описание</label>
@@ -196,7 +260,7 @@ export default function ProductForm() {
 
         <div style={{ display: "flex", gap: 16 }}>
           <div style={{ flex: 1 }}>
-            <label style={labelStyle}>Цена ($)</label>
+            <label style={labelStyle}>Цена (сомони)</label>
             <input name="price" type="number" value={product.price} onChange={handleChange} required style={fieldStyle}
               onFocus={e => (e.target.style.borderColor = "#FF0000")}
               onBlur={e => (e.target.style.borderColor = "#D9CFC0")}
