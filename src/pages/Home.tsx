@@ -103,7 +103,7 @@ export default function Home() {
           <div key={product.id} className="italian-card card-stagger" style={{ display: "flex", flexDirection: "column" }}>
             <Link to={`/product/${product.id}`} style={{ textDecoration: "none", display: "block" }}>
               {/* Фото */}
-              <div style={{ position: "relative", overflow: "hidden", height: 260 }}>
+              <div className="product-card-img-wrap" style={{ position: "relative", overflow: "hidden", height: 260 }}>
                 <img
                   src={product.image || "https://via.placeholder.com/400x300?text=DORRO"}
                   alt={product.name}

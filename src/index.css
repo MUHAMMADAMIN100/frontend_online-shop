@@ -41,6 +41,7 @@ h1, h2, h3, .serif { font-family: var(--font-serif); }
   letter-spacing: 3px;
   text-transform: uppercase;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.25s, transform 0.25s, box-shadow 0.25s;
   display: inline-block;
@@ -73,6 +74,7 @@ h1, h2, h3, .serif { font-family: var(--font-serif); }
   letter-spacing: 3px;
   text-transform: uppercase;
   border: 1px solid #FF0000;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.25s;
   display: inline-block;
@@ -93,6 +95,7 @@ h1, h2, h3, .serif { font-family: var(--font-serif); }
   letter-spacing: 3px;
   text-transform: uppercase;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.25s;
 }
@@ -106,7 +109,9 @@ h1, h2, h3, .serif { font-family: var(--font-serif); }
 .italian-card {
   background: #FFFFFF;
   border: 1px solid #D9CFC0;
+  border-radius: 10px;
   transition: box-shadow 0.35s, transform 0.35s;
+  overflow: hidden;
 }
 .italian-card:hover {
   box-shadow: 0 12px 40px rgba(0,0,0,0.10);
@@ -152,7 +157,7 @@ input, select, textarea {
   font-size: 13px !important;
   letter-spacing: 1px;
   border: 1px solid #D9CFC0 !important;
-  border-radius: 0 !important;
+  border-radius: 8px !important;
   outline: none !important;
   padding: 12px 16px !important;
   width: 100%;
@@ -181,7 +186,7 @@ input:focus, select:focus, textarea:focus {
 
 /* ── SweetAlert2 Italian Style ── */
 .iswal-popup {
-  border-radius: 0 !important;
+  border-radius: 12px !important;
   border: 1px solid #D9CFC0 !important;
   padding: 44px 52px !important;
   font-family: 'Montserrat', sans-serif !important;
@@ -215,6 +220,7 @@ input:focus, select:focus, textarea:focus {
   letter-spacing: 3px !important;
   text-transform: uppercase !important;
   border: none !important;
+  border-radius: 8px !important;
   cursor: pointer !important;
   transition: background-color 0.2s !important;
   margin: 0 6px !important;
@@ -230,6 +236,7 @@ input:focus, select:focus, textarea:focus {
   letter-spacing: 3px !important;
   text-transform: uppercase !important;
   border: 1px solid #D9CFC0 !important;
+  border-radius: 8px !important;
   cursor: pointer !important;
   transition: all 0.2s !important;
   margin: 0 6px !important;
@@ -237,7 +244,7 @@ input:focus, select:focus, textarea:focus {
 .iswal-btn-cancel:hover { border-color: #888 !important; color: #555 !important; }
 .iswal-timer { background: #FF0000 !important; height: 2px !important; }
 .iswal-toast {
-  border-radius: 0 !important;
+  border-radius: 10px !important;
   border-left: 3px solid #FF0000 !important;
   border-top: 1px solid #D9CFC0 !important;
   border-right: 1px solid #D9CFC0 !important;
@@ -451,7 +458,7 @@ input:focus, select:focus, textarea:focus {
   letter-spacing: 0.5px !important;
   border: 1px solid #D9CFC0 !important;
   height: 36px !important;
-  border-radius: 0 !important;
+  border-radius: 8px !important;
 }
 .nav-filter:focus {
   border-color: #008000 !important;
@@ -530,7 +537,12 @@ input, select, textarea, button {
   .product-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
 }
 @media (max-width: 600px) {
-  .product-grid { grid-template-columns: 1fr; gap: 14px; }
+  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .product-card-img-wrap { height: 155px !important; }
+  .product-grid .italian-card h3 { font-size: 13px !important; }
+  .product-grid .italian-card .serif { font-size: 15px !important; }
+  .product-grid .italian-card > a > div:last-child { padding: 12px 12px 8px !important; }
+  .product-grid .italian-card > div:last-child { padding: 0 12px 12px !important; }
 }
 
 /* Charts grid: 2 → 1 */
@@ -576,6 +588,7 @@ input, select, textarea, button {
   height: 40px;
   background: none;
   border: 1px solid #D9CFC0;
+  border-radius: 8px;
   cursor: pointer;
   padding: 8px;
   flex-shrink: 0;
@@ -627,6 +640,7 @@ input, select, textarea, button {
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   box-shadow: -8px 0 40px rgba(0,0,0,0.18);
+  border-radius: 16px 0 0 16px;
 }
 
 .drawer-header {
@@ -642,6 +656,7 @@ input, select, textarea, button {
   width: 36px;
   height: 36px;
   border: 1px solid #D9CFC0;
+  border-radius: 8px;
   background: none;
   cursor: pointer;
   display: flex;
@@ -788,6 +803,7 @@ input, select, textarea, button {
 .admin-content {
   background: #FFFFFF;
   border: 1px solid #D9CFC0;
+  border-radius: 10px;
   padding: 32px;
 }
 @media (max-width: 992px) {
@@ -872,5 +888,18 @@ input, select, textarea, button {
   }
   .checkout-name-phone {
     flex-direction: column !important;
+  }
+}
+
+/* ════════════════════════════════════════
+   MOBILE NAVBAR — LOGO CENTER
+════════════════════════════════════════ */
+@media (max-width: 992px) {
+  .navbar-inner { position: relative !important; }
+  .navbar-logo {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 1;
   }
 }

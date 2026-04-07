@@ -86,7 +86,7 @@ export default function Navbar() {
           <div className="navbar-inner" style={{ maxWidth: 1400, margin: "0 auto", display: "flex", alignItems: "center", gap: 20 }}>
 
             {/* ── Logo ── */}
-            <Link to="/" style={{
+            <Link to="/" className="navbar-logo" style={{
               textDecoration: "none", display: "flex", flexDirection: "column",
               alignItems: "center", gap: 0, flexShrink: 0
             }}>
@@ -162,11 +162,7 @@ export default function Navbar() {
                   onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"}
                   onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = "translateY(0)"}
                 >
-                  <svg width="22" height="22" fill="none" stroke="#008000" strokeWidth="1.6" viewBox="0 0 24 24">
-                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 01-8 0" />
-                  </svg>
+                  <i className="fas fa-shopping-cart" style={{ fontSize: 20, color: "#008000" }} />
                   <span style={{ fontSize: 7, letterSpacing: 2, textTransform: "uppercase", color: "#008000", fontFamily: "Montserrat", fontWeight: 600 }}>Корзина</span>
                   {totalCount > 0 && (
                     <span className="animate-scaleUp" style={{
@@ -194,9 +190,7 @@ export default function Navbar() {
                       onMouseEnter={e => (e.currentTarget as HTMLElement).style.transform = "scale(1.08)"}
                       onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = "scale(1)"}
                     >
-                      <svg width="19" height="19" fill="none" stroke="#FFFFFF" strokeWidth="1.8" viewBox="0 0 24 24">
-                        <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                      </svg>
+                      <i className="fas fa-user" style={{ fontSize: 16, color: "#FFFFFF" }} />
                     </button>
                     <span style={{ fontSize: 7, letterSpacing: 2, color: "#8B0000", fontFamily: "Montserrat", textTransform: "uppercase", display: "block", textAlign: "center", marginTop: 3 }}>Профиль</span>
 
@@ -209,9 +203,7 @@ export default function Navbar() {
                         <div style={{ padding: "16px 20px", borderBottom: "1px solid #F0ECE4", backgroundColor: "#FAFAF8" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <div style={{ width: 32, height: 32, borderRadius: "50%", backgroundColor: "#8B0000", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                              <svg width="16" height="16" fill="none" stroke="#fff" strokeWidth="1.8" viewBox="0 0 24 24">
-                                <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                              </svg>
+                              <i className="fas fa-user" style={{ fontSize: 14, color: "#fff" }} />
                             </div>
                             <div style={{ overflow: "hidden" }}>
                               <p style={{ fontSize: 8, letterSpacing: 2, textTransform: "uppercase", color: "#888", fontFamily: "Montserrat", marginBottom: 2 }}>
@@ -224,25 +216,23 @@ export default function Navbar() {
                           </div>
                         </div>
                         {([
-                          { to: "/cart", emoji: "🛍️", label: "Моя корзина" },
-                          { to: "/orderHistory", emoji: "📋", label: "Мои заказы" },
-                          ...(role === "ADMIN" ? [{ to: "/admin", emoji: "⚙️", label: "Панель Админа" }] : [])
-                        ] as { to: string; emoji: string; label: string }[]).map(item => (
+                          { to: "/cart", icon: "fa-shopping-cart", label: "Моя корзина" },
+                          { to: "/orderHistory", icon: "fa-clipboard-list", label: "Мои заказы" },
+                          ...(role === "ADMIN" ? [{ to: "/admin", icon: "fa-cog", label: "Панель Админа" }] : [])
+                        ] as { to: string; icon: string; label: string }[]).map(item => (
                           <Link key={item.to} to={item.to} className="profile-link" onClick={() => setShowProfile(false)}
                             style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 20px", textDecoration: "none", color: "#1A1A1A", fontFamily: "Montserrat", fontSize: 12, letterSpacing: 0.5, borderBottom: "1px solid #F7F4EF", transition: "background-color 0.15s" }}
                             onMouseEnter={e => (e.currentTarget as HTMLElement).style.backgroundColor = "#F7F4EF"}
                             onMouseLeave={e => (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"}
                           >
-                            <span style={{ fontSize: 15 }}>{item.emoji}</span>{item.label}
+                            <i className={`fas ${item.icon}`} style={{ fontSize: 14, width: 16, color: "#8B0000" }} />{item.label}
                           </Link>
                         ))}
                         <button onClick={handleLogout} style={{ width: "100%", padding: "12px 20px", display: "flex", alignItems: "center", gap: 12, fontFamily: "Montserrat", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#FF0000", background: "none", border: "none", cursor: "pointer", textAlign: "left", transition: "background-color 0.15s" }}
                           onMouseEnter={e => (e.currentTarget as HTMLElement).style.backgroundColor = "#FFF5F5"}
                           onMouseLeave={e => (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"}
                         >
-                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
-                          </svg>
+                          <i className="fas fa-sign-out-alt" style={{ fontSize: 14, width: 16 }} />
                           Выйти
                         </button>
                       </div>
@@ -255,9 +245,7 @@ export default function Navbar() {
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#8B0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "#1A1A1A"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}
                       >
-                        <svg width="18" height="18" fill="none" stroke="#1A1A1A" strokeWidth="1.8" viewBox="0 0 24 24">
-                          <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                        </svg>
+                        <i className="fas fa-user" style={{ fontSize: 16, color: "#1A1A1A" }} />
                       </div>
                       <span style={{ fontSize: 7, letterSpacing: 2, color: "#555", fontFamily: "Montserrat", textTransform: "uppercase" }}>Войти</span>
                     </Link>
@@ -266,9 +254,7 @@ export default function Navbar() {
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "#8B0000"; (e.currentTarget as HTMLElement).style.borderColor = "#8B0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "#FF0000"; (e.currentTarget as HTMLElement).style.borderColor = "#FF0000"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}
                       >
-                        <svg width="18" height="18" fill="none" stroke="#FFFFFF" strokeWidth="1.8" viewBox="0 0 24 24">
-                          <circle cx="10" cy="8" r="4" /><path d="M2 20c0-4 3.6-7 8-7" /><line x1="19" y1="12" x2="19" y2="20" /><line x1="15" y1="16" x2="23" y2="16" />
-                        </svg>
+                        <i className="fas fa-user-plus" style={{ fontSize: 15, color: "#FFFFFF" }} />
                       </div>
                       <span style={{ fontSize: 7, letterSpacing: 2, color: "#555", fontFamily: "Montserrat", textTransform: "uppercase" }}>Регистрация</span>
                     </Link>
@@ -307,9 +293,7 @@ export default function Navbar() {
               <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#8B0000", letterSpacing: 4, fontWeight: 600 }}>DORRO</span>
             </div>
             <button className="drawer-close" onClick={() => setMobileOpen(false)} aria-label="Закрыть">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2.5">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
+              <i className="fas fa-times" style={{ fontSize: 15, color: "#1A1A1A" }} />
             </button>
           </div>
 
@@ -354,11 +338,11 @@ export default function Navbar() {
           <div className="drawer-section">
             <p style={{ fontSize: 9, letterSpacing: 3, textTransform: "uppercase", color: "#888", fontFamily: "Montserrat", fontWeight: 600, marginBottom: 12 }}>Навигация</p>
             <Link to="/" className="drawer-link" onClick={() => setMobileOpen(false)}>
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <i className="fas fa-home" style={{ fontSize: 16, width: 18 }} />
               Каталог
             </Link>
             <Link to="/cart" className="drawer-link" onClick={() => setMobileOpen(false)}>
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              <i className="fas fa-shopping-cart" style={{ fontSize: 16, width: 18 }} />
               Корзина
               {totalCount > 0 && (
                 <span style={{ marginLeft: "auto", backgroundColor: "#FF0000", color: "#fff", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700 }}>{totalCount}</span>
@@ -366,13 +350,13 @@ export default function Navbar() {
             </Link>
             {token && (
               <Link to="/orderHistory" className="drawer-link" onClick={() => setMobileOpen(false)}>
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <i className="fas fa-clipboard-list" style={{ fontSize: 16, width: 18 }} />
                 Мои заказы
               </Link>
             )}
             {token && role === "ADMIN" && (
               <Link to="/admin" className="drawer-link" onClick={() => setMobileOpen(false)}>
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <i className="fas fa-cog" style={{ fontSize: 16, width: 18 }} />
                 Панель Админа
               </Link>
             )}
@@ -384,7 +368,7 @@ export default function Navbar() {
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "12px 0", borderBottom: "1px solid #F0ECE4" }}>
                   <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: "#8B0000", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="16" height="16" fill="none" stroke="#fff" strokeWidth="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                    <i className="fas fa-user" style={{ fontSize: 14, color: "#fff" }} />
                   </div>
                   <div>
                     <p style={{ fontSize: 9, letterSpacing: 2, color: "#888", fontFamily: "Montserrat", textTransform: "uppercase", margin: 0 }}>{role === "ADMIN" ? "Администратор" : "Покупатель"}</p>
@@ -392,7 +376,7 @@ export default function Navbar() {
                   </div>
                 </div>
                 <button onClick={handleLogout} style={{ width: "100%", padding: "12px 0", display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", color: "#FF0000", fontFamily: "Montserrat", fontSize: 12, letterSpacing: 2, textTransform: "uppercase" }}>
-                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  <i className="fas fa-sign-out-alt" style={{ fontSize: 14 }} />
                   Выйти
                 </button>
               </>
