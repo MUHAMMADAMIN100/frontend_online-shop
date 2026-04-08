@@ -12,6 +12,8 @@ interface Product {
 }
 
 const CATEGORIES = ["Футболки", "Кроссовки", "Шорты", "КОЛЛЕКЦИЯ"];
+const SIZES_CLOTHING = ["XS", "S", "M", "L", "XL", "XXL"];
+const SIZES_SHOES = ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"];
 
 // SVG-иконки
 const EditIcon = () => (
@@ -47,7 +49,7 @@ const ProductsManagement: React.FC = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [category, setCategory] = useState("");
   const [stock, setStock] = useState("0");
-  const [sizes, setSizes] = useState("");
+  const [sizes, setSizes] = useState<string[]>([]);
   const [colors, setColors] = useState<ColorVariant[]>([]);
   const [uploadingMain, setUploadingMain] = useState(false);
   const [uploadingColor, setUploadingColor] = useState<string | null>(null); // "ci-ii"
@@ -77,7 +79,7 @@ const ProductsManagement: React.FC = () => {
 
   const resetForm = () => {
     setEditingId(null); setName(""); setPrice(""); setDescription("");
-    setImageUrl(""); setCategory(""); setStock("0"); setSizes(""); setColors([]);
+    setImageUrl(""); setCategory(""); setStock("0"); setSizes([]); setColors([]);
   };
 
   const startEditing = (p: Product) => {
@@ -85,7 +87,7 @@ const ProductsManagement: React.FC = () => {
     setName(p.name); setPrice(String(p.price)); setDescription(p.description);
     setImageUrl(p.image || ""); setCategory(p.category);
     setStock(String(p.stock ?? 0));
-    setSizes(Array.isArray(p.sizes) ? p.sizes.join(", ") : "");
+    setSizes(Array.isArray(p.sizes) ? p.sizes : []);
     setColors(Array.isArray(p.colors) ? p.colors : []);
     setShowForm(true);
   };
@@ -95,7 +97,7 @@ const ProductsManagement: React.FC = () => {
     const body = {
       name, price: Number(price), description, image: imageUrl, category,
       stock: Number(stock),
-      sizes: sizes ? sizes.split(",").map(s => s.trim()).filter(Boolean) : [],
+      sizes,
       colors: colors.map(c => ({ ...c, images: c.images.filter(img => img.trim()) }))
     };
 
@@ -106,7 +108,8 @@ const ProductsManagement: React.FC = () => {
       setProducts(prev.map(p => p.id === editingId ? optimistic : p));
       resetForm(); setShowForm(false);
       setMessage("Товар обновлён"); setTimeout(() => setMessage(""), 3000);
-      cacheInvalidate("products"); // сбрасываем кэш главной страницы
+      cacheInvalidate("products");
+      cacheInvalidate(`product-${editingId}`);
 
       fetch(`${import.meta.env.VITE_API_URL}/admin/products/${editingId}`, {
         method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -336,35 +339,70 @@ const ProductsManagement: React.FC = () => {
                 </select>
               </div>
 
-              {/* Фото + Размеры в ряд */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                  <label style={{
-                    display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
-                    border: '1px solid #008000', color: '#008000', padding: '9px 12px',
-                    fontFamily: 'Montserrat', fontSize: 10, letterSpacing: 1, textTransform: 'uppercase',
-                    background: 'transparent', borderRadius: 8, transition: 'all 0.2s',
-                  }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#008000'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#008000'; }}
-                  >
-                    <i className="fas fa-upload" style={{ fontSize: 11 }} />
-                    {uploadingMain ? 'Загрузка...' : 'Загрузить фото'}
-                    <input type="file" accept="image/*" style={{ display: 'none' }} disabled={uploadingMain}
-                      onChange={async e => {
-                        const f = e.target.files?.[0]; if (!f) return;
-                        setUploadingMain(true);
-                        const url = await uploadFile(f);
-                        if (url) setImageUrl(url);
-                        setUploadingMain(false);
-                      }} />
-                  </label>
-                  {imageUrl && <img src={imageUrl} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4, border: '1px solid #D9CFC0' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />}
-                  <input placeholder="или вставьте URL" value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={{ ...inputStyle, fontSize: 11 }}
-                    onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
-                </div>
-                <input placeholder="Размеры: XS, S, M или 36, 37" value={sizes} onChange={e => setSizes(e.target.value)} style={inputStyle}
+              {/* Фото */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <label style={{
+                  display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+                  border: '1px solid #008000', color: '#008000', padding: '9px 12px',
+                  fontFamily: 'Montserrat', fontSize: 10, letterSpacing: 1, textTransform: 'uppercase',
+                  background: 'transparent', borderRadius: 8, transition: 'all 0.2s',
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#008000'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#008000'; }}
+                >
+                  <i className="fas fa-upload" style={{ fontSize: 11 }} />
+                  {uploadingMain ? 'Загрузка...' : 'Загрузить фото'}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} disabled={uploadingMain}
+                    onChange={async e => {
+                      const f = e.target.files?.[0]; if (!f) return;
+                      setUploadingMain(true);
+                      const url = await uploadFile(f);
+                      if (url) setImageUrl(url);
+                      setUploadingMain(false);
+                    }} />
+                </label>
+                {imageUrl && <img src={imageUrl} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4, border: '1px solid #D9CFC0' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />}
+                <input placeholder="или вставьте URL" value={imageUrl} onChange={e => setImageUrl(e.target.value)} style={{ ...inputStyle, fontSize: 11 }}
                   onFocus={e => (e.target.style.borderColor = '#8B0000')} onBlur={e => (e.target.style.borderColor = '#D9CFC0')} />
+              </div>
+
+              {/* Размеры — визуальные кнопки */}
+              <div style={{ border: '1px solid #D9CFC0', padding: '10px 12px', borderRadius: 8, backgroundColor: '#FAFAF8' }}>
+                <p style={{ fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: '#555', fontFamily: 'Montserrat', fontWeight: 600, marginBottom: 8 }}>
+                  Размеры {sizes.length > 0 && <span style={{ color: '#FF0000' }}>· {sizes.join(', ')}</span>}
+                </p>
+                {/* Одежда */}
+                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 6 }}>
+                  {SIZES_CLOTHING.map(s => (
+                    <button key={s} type="button"
+                      onClick={() => setSizes(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
+                      style={{
+                        minWidth: 40, height: 36, padding: '0 8px',
+                        border: sizes.includes(s) ? '2px solid #1A1A1A' : '1px solid #D9CFC0',
+                        backgroundColor: sizes.includes(s) ? '#1A1A1A' : '#fff',
+                        color: sizes.includes(s) ? '#fff' : '#1A1A1A',
+                        fontFamily: 'Montserrat', fontSize: 11, fontWeight: 600,
+                        cursor: 'pointer', transition: 'all 0.15s', borderRadius: 4,
+                      }}
+                    >{s}</button>
+                  ))}
+                </div>
+                {/* Обувь */}
+                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                  {SIZES_SHOES.map(s => (
+                    <button key={s} type="button"
+                      onClick={() => setSizes(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
+                      style={{
+                        minWidth: 40, height: 36, padding: '0 8px',
+                        border: sizes.includes(s) ? '2px solid #1A1A1A' : '1px solid #D9CFC0',
+                        backgroundColor: sizes.includes(s) ? '#1A1A1A' : '#fff',
+                        color: sizes.includes(s) ? '#fff' : '#1A1A1A',
+                        fontFamily: 'Montserrat', fontSize: 11, fontWeight: 600,
+                        cursor: 'pointer', transition: 'all 0.15s', borderRadius: 4,
+                      }}
+                    >{s}</button>
+                  ))}
+                </div>
               </div>
 
               {/* Описание — компактное */}
