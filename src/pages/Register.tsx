@@ -39,9 +39,7 @@ export default function RegisterPage() {
       <div className="animate-scaleUp" style={{ width: '100%', maxWidth: 440 }}>
 
         {/* ← Главное меню */}
-        <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#888", fontFamily: "Montserrat", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", marginBottom: 28, transition: "color 0.2s" }}
-          onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "#8B0000"}
-          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "#888"}>
+        <Link to="/" className="back-btn">
           <i className="fas fa-arrow-left" style={{ fontSize: 12 }} />
           Главное меню
         </Link>

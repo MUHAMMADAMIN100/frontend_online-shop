@@ -59,6 +59,7 @@ export default function ProductPage() {
   const [activeImage, setActiveImage]     = useState<string>("");
   const [imgFading, setImgFading]         = useState(false);
   const [addingToCart, setAddingToCart]   = useState(false);
+  const [touchStartX, setTouchStartX]     = useState<number | null>(null);
 
   const dispatch   = useDispatch<AppDispatch>();
   const token      = useSelector((state: RootState) => state.auth.token);
@@ -174,71 +175,69 @@ export default function ProductPage() {
   return (
     <div className="page-wrapper">
       {/* ← Главное меню */}
-      <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#555", fontFamily: "Montserrat", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", marginBottom: 20, transition: "color 0.2s" }}
-        onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "#8B0000"}
-        onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "#555"}>
+      <Link to="/" className="back-btn">
         <i className="fas fa-arrow-left" style={{ fontSize: 12 }} />
         Главное меню
       </Link>
       <div className="animate-slideInUp" style={{ maxWidth: 1100, margin: "0 auto", backgroundColor: "#FFFFFF", border: "1px solid #D9CFC0", display: "flex", flexWrap: "wrap" }}>
 
         {/* ═══ ЛЕВАЯ ЧАСТЬ: галерея ═══ */}
-        <div style={{ flex: "1 1 300px", minWidth: 0, display: "flex" }}>
+        <div style={{ flex: "1 1 300px", minWidth: 0, display: "flex", flexDirection: "column" }}>
 
-          {/* Тумбы (вертикальные) */}
-          {gallery.length > 1 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "16px 0 16px 16px", flexShrink: 0 }}>
-              {gallery.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => switchImage(img)}
-                  style={{
+          <div style={{ display: "flex", flex: 1 }}>
+            {/* Тумбы (вертикальные, только на десктопе) */}
+            {gallery.length > 1 && (
+              <div className="product-gallery-sidebar" style={{ display: "flex", flexDirection: "column", gap: 8, padding: "16px 0 16px 16px", flexShrink: 0 }}>
+                {gallery.map((img, i) => (
+                  <button key={i} onClick={() => switchImage(img)} style={{
                     width: 72, height: 72, padding: 0,
                     border: activeImage === img ? "2px solid #FF0000" : "1px solid #D9CFC0",
                     cursor: "pointer", background: "#FAFAFA", overflow: "hidden",
                     transform: activeImage === img ? "scale(1.05)" : "scale(1)",
                     transition: "all 0.22s", flexShrink: 0
-                  }}
-                >
-                  <img
-                    src={img} alt=""
-                    style={{
-                      width: "100%", height: "100%", objectFit: "cover", display: "block",
-                      filter: getColorFilter(selectedColor?.hex ?? ''),
-                      transition: "filter 0.3s ease"
-                    }}
-                  />
-                </button>
+                  }}>
+                    <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", filter: getColorFilter(selectedColor?.hex ?? ''), transition: "filter 0.3s ease" }} />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Главное фото + свайп на мобиле */}
+            <div
+              style={{ flex: 1, position: "relative", height: IMG_H, overflow: "hidden", cursor: gallery.length > 1 ? "grab" : "default" }}
+              onTouchStart={e => setTouchStartX(e.touches[0].clientX)}
+              onTouchEnd={e => {
+                if (touchStartX === null) return;
+                const dx = e.changedTouches[0].clientX - touchStartX;
+                if (Math.abs(dx) > 40) {
+                  const idx = gallery.indexOf(activeImage);
+                  if (dx < 0 && idx < gallery.length - 1) switchImage(gallery[idx + 1]);
+                  else if (dx > 0 && idx > 0) switchImage(gallery[idx - 1]);
+                }
+                setTouchStartX(null);
+              }}
+            >
+              {product.category && (
+                <div style={{ position: "absolute", top: 16, left: 0, zIndex: 2, backgroundColor: "#008000", color: "#fff", padding: "5px 16px", fontSize: 9, letterSpacing: 3, textTransform: "uppercase", fontFamily: "Montserrat", fontWeight: 600 }}>
+                  {product.category}
+                </div>
+              )}
+              <img
+                src={activeImage || "https://placehold.co/600x520/F7F4EF/8B0000?text=DORRO"}
+                alt={product.name}
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block", opacity: imgFading ? 0 : 1, transform: imgFading ? "scale(1.02)" : "scale(1)", filter: getColorFilter(selectedColor?.hex ?? ''), transition: "opacity 0.18s ease, transform 0.18s ease, filter 0.35s ease" }}
+              />
+            </div>
+          </div>
+
+          {/* Точки-навигатор (только мобиль) */}
+          {gallery.length > 1 && (
+            <div className="mobile-gallery-dots">
+              {gallery.map((img, i) => (
+                <button key={i} onClick={() => switchImage(img)} style={{ width: activeImage === img ? 20 : 8, height: 8, borderRadius: 4, backgroundColor: activeImage === img ? "#FF0000" : "#D9CFC0", border: "none", cursor: "pointer", padding: 0, transition: "all 0.2s" }} />
               ))}
             </div>
           )}
-
-          {/* Главное фото */}
-          <div style={{ flex: 1, position: "relative", height: IMG_H, overflow: "hidden" }}>
-            {product.category && (
-              <div style={{
-                position: "absolute", top: 16, left: 0, zIndex: 2,
-                backgroundColor: "#008000", color: "#fff",
-                padding: "5px 16px", fontSize: 9, letterSpacing: 3,
-                textTransform: "uppercase", fontFamily: "Montserrat", fontWeight: 600
-              }}>
-                {product.category}
-              </div>
-            )}
-            <img
-              src={activeImage || "https://placehold.co/600x520/F7F4EF/8B0000?text=DORRO"}
-              alt={product.name}
-              style={{
-                position: "absolute", inset: 0,
-                width: "100%", height: "100%",
-                objectFit: "cover", display: "block",
-                opacity: imgFading ? 0 : 1,
-                transform: imgFading ? "scale(1.02)" : "scale(1)",
-                filter: getColorFilter(selectedColor?.hex ?? ''),
-                transition: "opacity 0.18s ease, transform 0.18s ease, filter 0.35s ease"
-              }}
-            />
-          </div>
         </div>
 
         {/* ═══ ПРАВАЯ ЧАСТЬ: детали ═══ */}
@@ -349,18 +348,6 @@ export default function ProductPage() {
             {addingToCart ? "Добавляем..." : product.stock === 0 ? "Нет в наличии" : "Добавить в корзину"}
           </button>
 
-          {/* ── Гарантии ── */}
-          <div className="animate-fadeInDelay4" style={{
-            display: "flex", gap: 16, marginTop: 22,
-            paddingTop: 22, borderTop: "1px solid #F0ECE4", flexWrap: "wrap"
-          }}>
-            {[["🚚", "Бесплатная доставка"], ["✓", "Гарантия качества"], ["↩", "Возврат 30 дней"]].map(([icon, text]) => (
-              <div key={text} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ fontSize: 14 }}>{icon}</span>
-                <span style={{ fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase", color: "#999", fontFamily: "Montserrat" }}>{text}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>

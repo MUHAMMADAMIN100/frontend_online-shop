@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { notify } from "../utils/swal";
-import type { AppDispatch, RootState } from "../app/store";
-import { addToCart, optimisticAdd, optimisticRemove } from "../features/cart/cartSlice";
 import LoadingLogo from "../components/LoadingLogo";
 import { cacheGet, cacheSet } from "../utils/cache";
 
@@ -14,9 +10,6 @@ export default function Home() {
   const [products, setProducts] = useState<any[]>(() => cacheGet<any[]>(PRODUCTS_CACHE) ?? []);
   const [loading, setLoading] = useState(() => !cacheGet(PRODUCTS_CACHE));
   const [searchParams] = useSearchParams();
-  const dispatch   = useDispatch<AppDispatch>();
-  const token      = useSelector((state: RootState) => state.auth.token);
-  const cartItems  = useSelector((state: RootState) => state.cart.items);
 
   const search   = searchParams.get("search")   || "";
   const category = searchParams.get("category") || "";
@@ -40,35 +33,6 @@ export default function Home() {
     return true;
   });
 
-  const handleAdd = (productId: number) => {
-    if (!token) {
-      notify.warning("Войдите в аккаунт", "Для добавления товара необходима авторизация");
-      return;
-    }
-    const alreadyInCart = cartItems.some(item => item.productId === productId);
-    if (alreadyInCart) {
-      notify.warning("Уже в корзине", "Этот товар уже добавлен в корзину. Измените количество в корзине.");
-      return;
-    }
-    const product = filtered.find(p => p.id === productId);
-    if (!product) return;
-
-    // Мгновенное обновление UI
-    dispatch(optimisticAdd({
-      id: -productId,
-      productId,
-      quantity: 1,
-      product: { id: product.id, name: product.name, description: product.description || '', price: product.price, image: product.image }
-    }));
-    notify.addedToCart();
-
-    // Фоновая синхронизация с сервером
-    dispatch(addToCart({ productId, quantity: 1 })).catch(() => {
-      dispatch(optimisticRemove(-productId));
-      notify.error("Ошибка", "Не удалось добавить товар");
-    });
-  };
-
   if (loading) return <LoadingLogo height="80vh" />;
 
   return (
@@ -88,7 +52,7 @@ export default function Home() {
           <div style={{ width: 40, height: 1, backgroundColor: "#FF0000" }} />
         </div>
         <p style={{ fontSize: 12, letterSpacing: 2, color: "#888", fontFamily: "Montserrat" }}>
-          Итальянское качество · Спортивный стиль
+          Итальянский стиль
         </p>
         {(search || category || minPrice || maxPrice) && (
           <p style={{ marginTop: 12, fontSize: 11, color: "#888", fontFamily: "Montserrat", letterSpacing: 1 }}>
@@ -162,14 +126,13 @@ export default function Home() {
 
             {/* Кнопка */}
             <div style={{ padding: "0 20px 20px", marginTop: "auto" }}>
-              <button
-                onClick={() => handleAdd(product.id)}
-                disabled={product.stock === 0}
+              <Link
+                to={`/product/${product.id}`}
                 className="btn-primary"
-                style={{ width: "100%", textAlign: "center", opacity: product.stock === 0 ? 0.5 : 1 }}
+                style={{ width: "100%", textAlign: "center", display: "block" }}
               >
-                {product.stock === 0 ? "Нет в наличии" : "В корзину"}
-              </button>
+                Подробнее
+              </Link>
             </div>
           </div>
         ))}

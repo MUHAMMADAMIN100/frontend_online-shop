@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { notify } from "../utils/swal";
@@ -23,50 +23,37 @@ const Cart: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 
-  // Счётчик активных запросов — пока > 0, не синхронизируем localQty с Redux
-  const [pendingOps, setPendingOps] = useState(0);
-
-  // Реф для дедупликации синхронизации
-  const pendingOpsRef = useRef(0);
-
   useEffect(() => {
     dispatch(fetchCart()).finally(() => setInitialLoad(false));
   }, [dispatch]);
 
-  // Синхронизируем localQty только когда нет активных запросов
+  // Синхронизируем localQty из Redux только при первой загрузке
   useEffect(() => {
-    if (!initialLoad && pendingOps === 0) {
+    if (!initialLoad) {
       const q: Record<number, number> = {};
       items.forEach(item => { q[item.productId] = item.quantity; });
       setLocalQty(q);
     }
-  }, [items, initialLoad, pendingOps]);
+  }, [initialLoad]);
 
-  const handleAdd = useCallback(async (cartItemId: number, productId: number, size?: string, color?: string) => {
-    // Мгновенный UI
-    setLocalQty(prev => ({ ...prev, [cartItemId]: (prev[productId] || 1) + 1 }));
-    pendingOpsRef.current++;
-    setPendingOps(p => p + 1);
-    try {
-      await dispatch(addToCart({ productId, quantity: 1, size, color }));
-    } finally {
-      pendingOpsRef.current = Math.max(0, pendingOpsRef.current - 1);
-      setPendingOps(p => Math.max(0, p - 1));
-    }
+  const handleAdd = useCallback((_cartItemId: number, productId: number, size?: string, color?: string) => {
+    // Мгновенный UI — нет await, пользователь видит изменение сразу
+    setLocalQty(prev => ({ ...prev, [productId]: (prev[productId] || 1) + 1 }));
+    // Фоновый запрос
+    dispatch(addToCart({ productId, quantity: 1, size, color })).catch(() => {
+      setLocalQty(prev => ({ ...prev, [productId]: Math.max(1, (prev[productId] || 2) - 1) }));
+    });
   }, [dispatch]);
 
-  const handleRemove = useCallback(async (productId: number, size?: string, color?: string) => {
+  const handleRemove = useCallback((productId: number, size?: string, color?: string) => {
     const currentQty = localQty[productId] || 1;
     if (currentQty > 1) {
+      // Мгновенный UI
       setLocalQty(prev => ({ ...prev, [productId]: currentQty - 1 }));
-      pendingOpsRef.current++;
-      setPendingOps(p => p + 1);
-      try {
-        await dispatch(addToCart({ productId, quantity: -1, size, color }));
-      } finally {
-        pendingOpsRef.current = Math.max(0, pendingOpsRef.current - 1);
-        setPendingOps(p => Math.max(0, p - 1));
-      }
+      // Фоновый запрос
+      dispatch(addToCart({ productId, quantity: -1, size, color })).catch(() => {
+        setLocalQty(prev => ({ ...prev, [productId]: currentQty }));
+      });
     } else {
       const item = items.find(i => i.productId === productId && (i.size ?? null) === (size ?? null) && (i.color ?? null) === (color ?? null));
       if (item) {
@@ -97,6 +84,10 @@ const Cart: React.FC = () => {
   const handleCheckout = async () => {
     if (!name.trim() || !phone.trim() || !address.trim()) {
       notify.warning("Заполните все поля", "Имя, телефон и адрес обязательны");
+      return;
+    }
+    if (phone.replace(/\D/g, "").length < 7) {
+      notify.warning("Неверный телефон", "Введите корректный номер телефона");
       return;
     }
 
@@ -138,9 +129,7 @@ const Cart: React.FC = () => {
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
         {/* ← Главное меню */}
-        <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#555", fontFamily: "Montserrat", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", marginBottom: 24, transition: "color 0.2s" }}
-          onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "#8B0000"}
-          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "#555"}>
+        <Link to="/" className="back-btn">
           <i className="fas fa-arrow-left" style={{ fontSize: 12 }} />
           Главное меню
         </Link>
@@ -265,7 +254,8 @@ const Cart: React.FC = () => {
                 <input
                   placeholder="Телефон"
                   value={phone}
-                  onChange={e => setPhone(e.target.value)}
+                  inputMode="tel"
+                  onChange={e => setPhone(e.target.value.replace(/[^\d+\-\s()]/g, ""))}
                   style={{ flex: 1, border: '1px solid #D9CFC0', padding: '10px 12px', fontFamily: 'Montserrat', fontSize: 13, outline: 'none' }}
                   onFocus={e => (e.target.style.borderColor = '#8B0000')}
                   onBlur={e => (e.target.style.borderColor = '#D9CFC0')}

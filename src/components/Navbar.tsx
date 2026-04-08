@@ -103,8 +103,8 @@ export default function Navbar() {
                 lineHeight: 1.1, transition: "font-size 0.35s"
               }}>DORRO</span>
               <div style={{ width: "100%", height: 1, backgroundColor: "#8B0000", margin: "2px 0" }} />
-              <span style={{ fontSize: 6, letterSpacing: 3, color: "#8B0000", fontFamily: "Montserrat", textTransform: "uppercase" }}>
-                Итальянский Ателье · 1991
+              <span style={{ fontSize: 6, letterSpacing: 3, color: "#8B0000", fontFamily: "Montserrat", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                Italian Atelier 1991
               </span>
             </Link>
 
@@ -291,7 +291,10 @@ export default function Navbar() {
           <div className="drawer-header">
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <img src="/image.png" alt="DORRO" style={{ width: 32, height: 32, objectFit: "contain" }} />
-              <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#8B0000", letterSpacing: 4, fontWeight: 600 }}>DORRO</span>
+              <div>
+                <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#8B0000", letterSpacing: 4, fontWeight: 600 }}>DORRO</span>
+                <div style={{ fontSize: 6, letterSpacing: 2, color: "#8B0000", fontFamily: "Montserrat", textTransform: "uppercase", marginTop: 1 }}>Italian Atelier 1991</div>
+              </div>
             </div>
             <button className="drawer-close" onClick={() => setMobileOpen(false)} aria-label="Закрыть">
               <i className="fas fa-times" style={{ fontSize: 15, color: "#1A1A1A" }} />

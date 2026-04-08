@@ -892,6 +892,55 @@ input, select, textarea, button {
 }
 
 /* ════════════════════════════════════════
+   BACK BUTTON — красный «← Главное меню»
+════════════════════════════════════════ */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  background-color: #FF0000;
+  color: #FFFFFF !important;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  transition: background-color 0.2s, transform 0.2s;
+}
+.back-btn:hover {
+  background-color: #8B0000;
+  transform: translateY(-1px);
+}
+
+/* ════════════════════════════════════════
+   PRODUCT PAGE — мобильная карусель
+════════════════════════════════════════ */
+/* Боковые миниатюры — скрыты на мобильном */
+.product-gallery-sidebar {
+  display: flex;
+}
+@media (max-width: 600px) {
+  .product-gallery-sidebar { display: none !important; }
+}
+
+/* Точки навигации карусели — видны только на мобильном */
+.mobile-gallery-dots {
+  display: none;
+}
+@media (max-width: 600px) {
+  .mobile-gallery-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+}
+
+/* ════════════════════════════════════════
    MOBILE NAVBAR — LOGO CENTER
 ════════════════════════════════════════ */
 @media (max-width: 992px) {
