@@ -204,16 +204,18 @@ const Cart: React.FC = () => {
               </div>
             )}
 
-            <div className="cart-footer" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '28px 32px', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
-              <div>
-                <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Итого</p>
-                <p className="serif" style={{ fontSize: 28, color: '#008000', fontWeight: 600 }}>{totalPrice.toLocaleString()} сом.</p>
+            {!orderCompleted && (
+              <div className="cart-footer" style={{ backgroundColor: '#FFFFFF', border: '1px solid #D9CFC0', padding: '28px 32px', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+                <div>
+                  <p style={{ fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: '#888', fontFamily: 'Montserrat', marginBottom: 4 }}>Итого</p>
+                  <p className="serif" style={{ fontSize: 28, color: '#008000', fontWeight: 600 }}>{totalPrice.toLocaleString()} сом.</p>
+                </div>
+                <div className="cart-footer-buttons" style={{ display: 'flex', gap: 12 }}>
+                  <button onClick={handleClear} className="btn-secondary">Очистить</button>
+                  <button onClick={() => setShowCheckout(true)} className="btn-primary">Оформить заказ</button>
+                </div>
               </div>
-              <div className="cart-footer-buttons" style={{ display: 'flex', gap: 12 }}>
-                <button onClick={handleClear} className="btn-secondary">Очистить</button>
-                <button onClick={() => setShowCheckout(true)} className="btn-primary">Оформить заказ</button>
-              </div>
-            </div>
+            )}
           </>
         )}
 

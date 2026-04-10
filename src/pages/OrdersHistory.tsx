@@ -5,7 +5,7 @@ import type { RootState } from "../app/store";
 import LoadingLogo from "../components/LoadingLogo";
 import { cacheGet, cacheSet } from "../utils/cache";
 
-interface OrderItem { id: number; product: { id: number; name: string; price: number; image?: string }; quantity: number; price: number; }
+interface OrderItem { id: number; product: { id: number; name: string; price: number; image?: string } | null; quantity: number; price: number; }
 interface Order { id: number; createdAt: string; items: OrderItem[]; }
 
 const OrdersHistory: React.FC = () => {
@@ -76,9 +76,9 @@ const OrdersHistory: React.FC = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {order.items.map(item => (
                     <div key={item.id} className="order-item-row" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <img src={item.product.image || "https://via.placeholder.com/60"} alt={item.product.name} style={{ width: 60, height: 60, objectFit: 'cover' }} />
+                      <img src={item.product?.image || "https://placehold.co/60x60/F7F4EF/8B0000?text=?"} alt={item.product?.name || "Товар"} style={{ width: 60, height: 60, objectFit: 'cover' }} />
                       <div style={{ flex: 1 }}>
-                        <p className="serif" style={{ fontSize: 15, color: '#1A1A1A', fontWeight: 500 }}>{item.product.name}</p>
+                        <p className="serif" style={{ fontSize: 15, color: '#1A1A1A', fontWeight: 500 }}>{item.product?.name || "Товар удалён"}</p>
                         <p style={{ fontSize: 11, color: '#888', fontFamily: 'Montserrat' }}>{item.quantity} × {item.price.toLocaleString()} сом.</p>
                       </div>
                       <p className="serif" style={{ fontSize: 16, color: '#008000', fontWeight: 600 }}>{(item.quantity * item.price).toLocaleString()} сом.</p>
